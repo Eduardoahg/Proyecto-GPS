@@ -3,14 +3,14 @@ package org.example;
 import java.util.Objects;
 
 public class Parada {
-
-    //Representa los nodos
     private String id;
     private String nombre;
+    private String localizacion; // Coordenadas o descripción
 
-    public Parada(String id, String nombre) {
+    public Parada(String id, String nombre, String localizacion) {
         this.id = id;
         this.nombre = nombre;
+        this.localizacion = localizacion;
     }
 
     public String getId() {
@@ -29,7 +29,14 @@ public class Parada {
         this.nombre = nombre;
     }
 
-    // Metodos equals y hashCode necesarios para usar Parada como Key en un HashMap
+    public String getLocalizacion() {
+        return localizacion;
+    }
+
+    public void setLocalizacion(String localizacion) {
+        this.localizacion = localizacion;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
