@@ -5,8 +5,6 @@ public class Main {
     public static void main(String[] args) {
         GrafoTransporte sistema = new GrafoTransporte();
 
-        System.out.println("=== PRUEBA DE ESTRÉS: SISTEMA DE GESTIÓN DE RUTAS (40%) ===");
-
         //Datos Iniciales
         Parada p1 = new Parada("P01", "Parada La Mora");
         Parada p2 = new Parada("P02", "Parada Los Halamos");
