@@ -5,37 +5,68 @@ public class Main {
     public static void main(String[] args) {
         GrafoTransporte sistema = new GrafoTransporte();
 
-        // 1. Creación de Paradas (Nodos) [cite: 10, 16]
-        Parada p1 = new Parada("ESCT", "Estacion Central");
-        Parada p2 = new Parada("PAGB", "Parada Gurabo");
-        Parada p3 = new Parada("CTHO", "Centro Histórico");
+        System.out.println("=== PRUEBA DE ESTRÉS: SISTEMA DE GESTIÓN DE RUTAS (40%) ===");
 
-        // 2. Agregar Paradas al sistema
+        //Datos Iniciales
+        Parada p1 = new Parada("P01", "Parada La Mora");
+        Parada p2 = new Parada("P02", "Parada Los Halamos");
+        Parada p3 = new Parada("P03", "Parada San Juan");
+        Parada p4 = new Parada("P04", "Parada La Vieja");
+
         sistema.agregarParada(p1);
         sistema.agregarParada(p2);
         sistema.agregarParada(p3);
+        sistema.agregarParada(p4);
 
-        // 3. Agregar Rutas (Aristas) con sus atributos [cite: 9, 10, 11]
-        // Ruta: p1 -> p2 (Distancia: 5km, Tiempo: 10min, Costo: 25.0, Sin trasbordo)
+        // Creacion de la red para probar lo que la lista de adyacnecia
+        // PRA-MA -> PRA-HL, PRA-MA -> PRA-SJ, PRA-MA -> PRA-VJ  (Una parada con muchos destinos)
         sistema.agregarRuta(p1, p2, 10.0, 5.0, 25.0, false);
+        sistema.agregarRuta(p1, p3, 15.0, 7.5, 30.0, true);
+        sistema.agregarRuta(p1, p4, 25.0, 12.0, 50.0, false);
 
-        // Ruta: p2 -> p3 (Distancia: 3km, Tiempo: 15min, Costo: 35.0, Con trasbordo)
-        sistema.agregarRuta(p2, p3, 15.0, 3.0, 35.0, true);
+        // Conexiones de retorno y transversales
+        sistema.agregarRuta(p2, p1, 12.0, 5.0, 25.0, false);
+        sistema.agregarRuta(p3, p4, 10.0, 4.0, 20.0, false);
 
-        System.out.println("--- Red de Transporte Inicial ---");
+        System.out.println("\n ESTADO 1: Red creada ");
         sistema.imprimirGrafo();
 
-        // 4. Modificación de Datos (Hito de Gestión 20%) [cite: 11, 15, 16]
-        System.out.println("\n--- Modificando nombre de Parada S02 y tiempo de Ruta p1->p2 ---");
-        sistema.modificarParada("S02", "Terminal Norte Principal");
-        sistema.modificarRuta(p1, p2, 12.0, 5.0, 25.0, false); // Aumentó el tráfico (12 min)
+        // Pruebas de las modificaciones y validaciones [cite: 16, 17]
+        System.out.println("\n ESTADO 2: Pruebas de Modificación");
 
-        // 5. Verificación de eliminación
-        System.out.println("\n--- Eliminando Parada Centro Histórico (S03) ---");
-        sistema.eliminarParada(p3);
+        // Modificacion exitosa
+        System.out.println("Modificando P02 ...");
+        sistema.modificarParada("P02", "Parada La Herradura");
+        System.out.println("Modificando P01 ...");
+        sistema.modificarParada("P01", "Parada Las Palmas");
 
-        // Mostrar estado final para verificar consistencia
-        System.out.println("\n--- Estado Final del Sistema ---");
+        // Validacion de que no se pueda modificar una parada que no existe
+        System.out.println("Intentando modificar parada 'P05' (No existe):");
+        sistema.modificarParada("P05", "Parada que no existe");
+        System.out.println("Intentando modificar parada 'P06' (No existe):");
+        sistema.modificarParada("P06", "Parada que no existe");
+
+        // Eliminacion de dependencias [cite: 11, 45]
+        // Si eliminamos P04 se deberia:
+        // Borrar la entrada de P04 en el mapa.
+        // Borrar la ruta P01 -> P04 y P03 -> P04 .
+        System.out.println("\n ESTADO 3: Eliminando 'Parada La Vieja' (P04) y verificando rutas huerfanas ");
+        sistema.eliminarParada(p4);
+
+        sistema.imprimirGrafo();
+
+        // Prueba de gestiond e rutas [cite: 15, 58]
+        System.out.println("\n ESTADO 4: Eliminacion y Modificación de Rutas ");
+
+        // Eliminar una ruta especifica sin borrar la parada
+        System.out.println("Eliminando ruta específica: Parada La Mora -> Parada San Juan");
+        sistema.eliminarRuta(p1, p3);
+
+        // Modificar una ruta existente
+        System.out.println("Actualizando costos de ruta: Parada La Herradura -> Parada La Mora");
+        sistema.modificarRuta(p2, p1, 14.0, 5.0, 45.0, true);
+
+        System.out.println("\n Resultado final");
         sistema.imprimirGrafo();
     }
 }
