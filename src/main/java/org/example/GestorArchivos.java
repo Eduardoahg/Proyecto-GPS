@@ -5,18 +5,15 @@ import java.util.Map;
 import java.util.List;
 
 public class GestorArchivos {
-
     public static void guardarDatos(GrafoTransporte grafo, String rutaParadas, String rutaRutas) {
-        // Guardar Paradas [cite: 59]
         try (PrintWriter pw = new PrintWriter(new FileWriter(rutaParadas))) {
             for (Parada p : grafo.getGrafo().keySet()) {
-                pw.println(p.getId() + "," + p.getNombre() + "," + p.getLocalizacion());
+                pw.println(p.getId() + "," + p.getNombre() + "," + p.getLocalizacion() + "," + p.getX() + "," + p.getY());
             }
         } catch (IOException e) {
             System.out.println("Error guardando paradas: " + e.getMessage());
         }
 
-        // Guardar Rutas [cite: 59]
         try (PrintWriter pw = new PrintWriter(new FileWriter(rutaRutas))) {
             for (Map.Entry<Parada, List<Ruta>> entry : grafo.getGrafo().entrySet()) {
                 String idOri = entry.getKey().getId();
@@ -32,18 +29,17 @@ public class GestorArchivos {
     }
 
     public static void cargarDatos(GrafoTransporte grafo, String rutaParadas, String rutaRutas) {
-        // Cargar Paradas [cite: 59]
         try (BufferedReader br = new BufferedReader(new FileReader(rutaParadas))) {
             String linea;
             while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(",");
-                grafo.agregarParada(new Parada(datos[0], datos[1], datos[2]));
+                String[] d = linea.split(",");
+                Parada p = new Parada(d[0], d[1], d[2], Double.parseDouble(d[3]), Double.parseDouble(d[4]));
+                grafo.agregarParada(p);
             }
-        } catch (IOException e) {
-            System.out.println("No se encontró archivo de paradas.");
+        } catch (IOException | ArrayIndexOutOfBoundsException e) {
+            System.out.println("Archivo de paradas vacío o desactualizado.");
         }
 
-        // Cargar Rutas [cite: 59]
         try (BufferedReader br = new BufferedReader(new FileReader(rutaRutas))) {
             String linea;
             while ((linea = br.readLine()) != null) {
@@ -52,7 +48,7 @@ public class GestorArchivos {
                         Double.parseDouble(d[4]), Boolean.parseBoolean(d[5]));
             }
         } catch (IOException e) {
-            System.out.println("No se encontró archivo de rutas.");
+            System.out.println("No se encontro archivo de rutas.");
         }
     }
 }

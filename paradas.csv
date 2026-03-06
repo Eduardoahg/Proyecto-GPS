@@ -1,4 +1,4 @@
-A,Estación Central,Centro Ciudad
-B,Plaza Norte,Zona Norte
-C,Terminal Sur,Zona Sur
-D,Aeropuerto,Afueras
+A,Estación Central,Centro Ciudad,100.0,300.0
+B,Plaza Norte,Zona Norte,400.0,100.0
+C,Terminal Sur,Zona Sur,400.0,500.0
+D,Aeropuerto,Afueras,700.0,300.0

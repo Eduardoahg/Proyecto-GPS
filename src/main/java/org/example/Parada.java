@@ -1,40 +1,27 @@
 package org.example;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.Objects;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Parada {
     private String id;
     private String nombre;
-    private String localizacion; // Coordenadas o descripción
+    private String localizacion;
+    private double x; 
+    private double y;
 
     public Parada(String id, String nombre, String localizacion) {
         this.id = id;
         this.nombre = nombre;
         this.localizacion = localizacion;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getLocalizacion() {
-        return localizacion;
-    }
-
-    public void setLocalizacion(String localizacion) {
-        this.localizacion = localizacion;
+        this.x = 0; // Valor por defecto
+        this.y = 0; // Valor por defecto
     }
 
     @Override
@@ -44,14 +31,14 @@ public class Parada {
         Parada parada = (Parada) o;
         return Objects.equals(id, parada.id);
     }
-
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return id.hashCode();
     }
 
     @Override
     public String toString() {
+
         return nombre + " (" + id + ")";
     }
 }

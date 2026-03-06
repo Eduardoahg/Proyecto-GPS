@@ -16,26 +16,27 @@ public class Ruta {
     }
 
     public Parada getDestino() {
+
         return destino;
     }
-
     public double getTiempo() {
+
         return tiempo;
     }
-
     public void setTiempo(double tiempo) {
+
         this.tiempo = tiempo;
     }
-
     public double getDistancia() {
+
         return distancia;
     }
-
     public double getCosto() {
+
         return costo;
     }
-
     public boolean isRequiereTrasbordo() {
+
         return requiereTrasbordo;
     }
 }
