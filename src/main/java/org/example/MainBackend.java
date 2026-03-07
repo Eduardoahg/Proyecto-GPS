@@ -10,8 +10,8 @@ public class MainBackend {
         sistema.agregarParada(new Parada("D", "Aeropuerto", "Este", 700.0, 300.0));
         sistema.agregarParada(new Parada("E", "Parque Independencia", "Oeste", 250.0, 200.0));
         sistema.agregarParada(new Parada("F", "Villa Mella", "Norte Extremo", 250.0, 400.0));
-        sistema.agregarParada(new Parada("G", "Zona Colonial", "Centro Histórico", 550.0, 200.0));
-        sistema.agregarParada(new Parada("H", "Malecón", "Costa", 550.0, 400.0));
+        sistema.agregarParada(new Parada("G", "Zona Colonial", "Centro Historico", 550.0, 200.0));
+        sistema.agregarParada(new Parada("H", "Malecon", "Costa", 550.0, 400.0));
         sistema.agregarParada(new Parada("I", "Piantini", "Centro Comercial", 400.0, 300.0));
         sistema.agregarParada(new Parada("J", "Boca Chica", "Playa", 900.0, 300.0));
 

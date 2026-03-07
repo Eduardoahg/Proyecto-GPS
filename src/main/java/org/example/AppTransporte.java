@@ -12,7 +12,7 @@ public class AppTransporte extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/AppTransporte.fxml"));
         stage.setTitle("GPS Transporte Público");
         stage.setScene(new Scene(root, 1100, 700));
-        stage.show();
+        stage.show();//hola
     }
 
     public static void main(String[] args) {

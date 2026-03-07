@@ -213,7 +213,7 @@ public class GrafoTransporte {
                 return r.isRequiereTrasbordo() ? 10.0 : 1.0;
             case "costo":
                 return r.getCosto();
-            default:
+            default://hola
                 return r.getDistancia();
         }
     }

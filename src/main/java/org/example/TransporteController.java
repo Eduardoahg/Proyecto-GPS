@@ -211,9 +211,9 @@ public class TransporteController {
             double distPixeles = Math.sqrt(Math.pow(paradaDesde.getX() - paradaHacia.getX(), 2) +
                     Math.pow(paradaDesde.getY() - paradaHacia.getY(), 2));
 
-            double distReal = distPixeles / 20.0;
+            double distReal = distPixeles / 20.0; //Hola
             double tiempo = (distReal / 30.0) * 60.0;
-            double costo = distReal * 5.0;
+            double costo = distReal * 3.5;
             boolean necesitaTrasbordo = distReal > 10.0;
 
             if (distReal > 0 && tiempo > 0) {
