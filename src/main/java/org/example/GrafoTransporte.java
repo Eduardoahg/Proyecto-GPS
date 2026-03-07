@@ -51,8 +51,11 @@ public class GrafoTransporte {
         }
     }
 
-    public Parada buscarParada(String id) {
-        return adjList.keySet().stream().filter(p -> p.getId().equals(id)).findFirst().orElse(null);
+    public Parada buscarParada(String criterio) {
+        return adjList.keySet().stream()
+                .filter(p -> p.getId().equalsIgnoreCase(criterio) || p.getNombre().equalsIgnoreCase(criterio))
+                .findFirst()
+                .orElse(null);
     }
 
     public Map<Parada, List<Ruta>> getGrafo() {
@@ -65,10 +68,10 @@ public class GrafoTransporte {
 
     // 1. DIJKSTRA: Ruta más corta por tiempo, distancia o transbordos [cite: 18, 27, 40, 118]
     // Complejidad Espacial: O(V)
-    public String dijkstra(String idOrigen, String idDestino, String criterio) {
-        Parada origen = buscarParada(idOrigen);
-        Parada destino = buscarParada(idDestino);
-        if (origen == null || destino == null) return "Paradas no válidas.";
+    public List<Parada> calcularRutaDijkstra(String idOri, String idDest, String criterio) {
+        Parada origen = buscarParada(idOri);
+        Parada destino = buscarParada(idDest);
+        if (origen == null || destino == null) return new ArrayList<>();
 
         Map<Parada, Double> distancias = new HashMap<>();
         Map<Parada, Parada> padres = new HashMap<>();
@@ -91,7 +94,11 @@ public class GrafoTransporte {
                 }
             }
         }
-        return construirStringCamino("Dijkstra (" + criterio + ")", destino, padres, distancias.get(destino));
+
+        List<Parada> camino = new ArrayList<>();
+        if (!padres.containsKey(destino) && !origen.equals(destino)) return camino;
+        for (Parada p = destino; p != null; p = padres.get(p)) camino.add(0, p);
+        return camino;
     }
 
     // 2. BELLMAN-FORD: Útil si existen costos/tarifas negativas (descuentos) [cite: 19, 119]
@@ -207,6 +214,22 @@ public class GrafoTransporte {
             default:
                 return r.getDistancia();
         }
+    }
+
+    public double calcularPesoTotalCamino(List<Parada> camino, String criterio) {
+        double total = 0;
+        for (int i = 0; i < camino.size() - 1; i++) {
+            Parada actual = camino.get(i);
+            Parada siguiente = camino.get(i + 1);
+            List<Ruta> rutas = adjList.get(actual);
+            for (Ruta r : rutas) {
+                if (r.getDestino().equals(siguiente)) {
+                    total += obtenerPeso(r, criterio);
+                    break;
+                }
+            }
+        }
+        return total;
     }
 
     private String construirStringCamino(String alg, Parada dest, Map<Parada, Parada> padres, double total) {
