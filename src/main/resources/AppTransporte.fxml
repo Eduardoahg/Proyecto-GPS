@@ -1,29 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.canvas.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.TransporteController">
+<StackPane prefHeight="700.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.TransporteController">
     <children>
         <VBox fx:id="panelInicio" alignment="CENTER" spacing="30.0" style="-fx-background-color: #2c3e50;">
             <children>
-                <Label text="SISTEMA GPS" textFill="WHITE">
+                <Label alignment="CENTER" text="SISTEMA GPS" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="48.0" />
                     </font>
                 </Label>
-                <Button mnemonicParsing="false" onAction="#entrarAlGPS" prefHeight="60.0" prefWidth="250.0" style="-fx-background-color: #e74c3c;" text="ABRIR GPS" textFill="WHITE">
+                <Button mnemonicParsing="false" onAction="#entrarAlGPS" prefHeight="60.0" prefWidth="300.0" style="-fx-background-color: #e74c3c;" text="ABRIR GPS" textFill="WHITE">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Button>
+                <Button onAction="#abrirEditor" prefHeight="60.0" prefWidth="300.0" style="-fx-background-color: #34495e;" text="CREAR / MODIFICAR" textAlignment="CENTER" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="24.0" />
                     </font>
                 </Button>
             </children>
         </VBox>
+
+        <BorderPane fx:id="panelEditor" visible="false">
+            <left>
+                <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: #f4f4f4;">
+                    <children>
+                        <Label style="-fx-font-weight: bold;" text="EDITOR DE RED" />
+                        <Label text="Instrucciones:&#10;1. Clic Izq: Crear Parada&#10;2. Arrastrar: Crear Ruta &#10;3. Click Der: Eliminar Parada" />
+                        <Button maxWidth="Infinity" onAction="#guardarEditor" style="-fx-background-color: #27ae60;" text="Guardar Cambios" textFill="WHITE" />
+                        <Button maxWidth="Infinity" onAction="#volverAlInicio" style="-fx-background-color: #7f8c8d;" text="Volver al Menú" textFill="WHITE" />
+                    </children>
+                </VBox>
+            </left>
+            <center>
+                <VBox alignment="CENTER" style="-fx-background-color: #bdc3c7;">
+                    <children>
+                        <Canvas fx:id="canvasEditor" height="650.0" onMouseClicked="#clicEditor" onMousePressed="#presionarEditor" onMouseReleased="#soltarEditor" width="750.0" />
+                    </children>
+                </VBox>
+            </center>
+        </BorderPane>
+
         <BorderPane fx:id="panelGPS" visible="false">
             <left>
-                <VBox prefWidth="300.0" spacing="15.0" style="-fx-background-color: #ecf0f1; -fx-padding: 20;" BorderPane.alignment="CENTER">
+                <VBox prefWidth="300.0" spacing="15.0" style="-fx-background-color: #ecf0f1; -fx-padding: 20;">
                     <children>
                         <Label text="Configuración de Ruta">
                             <font>
@@ -45,11 +71,16 @@
                             </font>
                         </Label>
                         <TextArea fx:id="log" editable="false" prefHeight="300.0" wrapText="true" />
+                        <Button maxWidth="Infinity" onAction="#volverAlInicio" style="-fx-background-color: #7f8c8d;" text="VOLVER AL MENÚ" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Button>
                     </children>
                 </VBox>
             </left>
             <center>
-                <VBox alignment="CENTER" style="-fx-background-color: #bdc3c7;" BorderPane.alignment="CENTER">
+                <VBox alignment="CENTER" style="-fx-background-color: #bdc3c7;">
                     <children>
                         <Canvas fx:id="canvasMapa" height="650.0" onMouseClicked="#seleccionarParada" width="750.0" />
                     </children>

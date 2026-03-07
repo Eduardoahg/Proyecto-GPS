@@ -206,11 +206,13 @@ public class GrafoTransporte {
     private double obtenerPeso(Ruta r, String criterio) {
         switch (criterio.toLowerCase()) {
             case "tiempo":
-                return r.getTiempo(); //[cite:27]
+                return r.getTiempo();
             case "distancia":
-                return r.getDistancia(); //[cite:27]
+                return r.getDistancia();
             case "transbordos":
-                return r.isRequiereTrasbordo() ? 1.0 : 0.0; //[cite:27]
+                return r.isRequiereTrasbordo() ? 10.0 : 1.0;
+            case "costo":
+                return r.getCosto();
             default:
                 return r.getDistancia();
         }
@@ -224,7 +226,11 @@ public class GrafoTransporte {
             List<Ruta> rutas = adjList.get(actual);
             for (Ruta r : rutas) {
                 if (r.getDestino().equals(siguiente)) {
-                    total += obtenerPeso(r, criterio);
+                    if (criterio.equalsIgnoreCase("transbordos")) {
+                        if (r.isRequiereTrasbordo()) total += 1;
+                    } else {
+                        total += obtenerPeso(r, criterio);
+                    }
                     break;
                 }
             }
