@@ -38,7 +38,14 @@ public class GrafoTransporte {
         }
     }
 
-    // Simulación en Tiempo Real: Ajustar tiempos por tráfico [cite: 34, 44, 45]
+    public void modificarParada(String id, String nuevoNombre) {
+        Parada p = buscarParada(id);
+        if (p != null) {
+            p.setNombre(nuevoNombre);
+        }
+    }
+
+    // Simulación en Tiempo Real: Ajustar tiempos por tráfico
     public void actualizarTiempoRuta(String idOrigen, String idDestino, double nuevoTiempo) {
         Parada origen = buscarParada(idOrigen);
         if (origen != null) {
@@ -84,7 +91,6 @@ public class GrafoTransporte {
         while (!pq.isEmpty()) {
             Parada u = pq.poll();
             if (u.equals(destino)) break;
-
             for (Ruta r : adjList.getOrDefault(u, new ArrayList<>())) {
                 double peso = obtenerPeso(r, criterio);
                 if (distancias.get(u) + peso < distancias.get(r.getDestino())) {
@@ -94,11 +100,37 @@ public class GrafoTransporte {
                 }
             }
         }
-
         List<Parada> camino = new ArrayList<>();
         if (!padres.containsKey(destino) && !origen.equals(destino)) return camino;
         for (Parada p = destino; p != null; p = padres.get(p)) camino.add(0, p);
         return camino;
+    }
+
+    public List<List<Parada>> obtenerCaminosAlternativos(String idOri, String idDest) {
+        Parada origen = buscarParada(idOri);
+        Parada destino = buscarParada(idDest);
+        List<List<Parada>> todosLosCaminos = new ArrayList<>();
+        if (origen != null && destino != null) {
+            dfsTodosLosCaminos(origen, destino, new HashSet<>(), new ArrayList<>(List.of(origen)), todosLosCaminos);
+        }
+        return todosLosCaminos;
+    }
+
+    private void dfsTodosLosCaminos(Parada actual, Parada destino, Set<Parada> visitados, List<Parada> caminoActual, List<List<Parada>> resultados) {
+        if (resultados.size() > 15) return;
+        if (actual.equals(destino)) {
+            resultados.add(new ArrayList<>(caminoActual));
+            return;
+        }
+        visitados.add(actual);
+        for (Ruta r : adjList.getOrDefault(actual, new ArrayList<>())) {
+            if (!visitados.contains(r.getDestino())) {
+                caminoActual.add(r.getDestino());
+                dfsTodosLosCaminos(r.getDestino(), destino, visitados, caminoActual, resultados);
+                caminoActual.remove(caminoActual.size() - 1);
+            }
+        }
+        visitados.remove(actual);
     }
 
     // 2. BELLMAN-FORD: Útil si existen costos/tarifas negativas (descuentos) [cite: 19, 119]
@@ -213,7 +245,7 @@ public class GrafoTransporte {
                 return r.isRequiereTrasbordo() ? 10.0 : 1.0;
             case "costo":
                 return r.getCosto();
-            default://hola
+            default:
                 return r.getDistancia();
         }
     }

@@ -1,10 +1,6 @@
-A,Estacion Central,Centro,100.0,300.0
-B,Plaza Norte,Norte,400.0,100.0
-C,Terminal Sur,Sur,400.0,500.0
-D,Aeropuerto,Este,700.0,300.0
-E,Parque Independencia,Oeste,250.0,200.0
-F,Villa Mella,Norte Extremo,250.0,400.0
-G,Zona Colonial,Centro Historico,550.0,200.0
-H,Malecon,Costa,550.0,400.0
-I,Piantini,Centro Comercial,400.0,300.0
+P2,A,Ubicaci¢n,366.4000000000001,92.8
+P3,B,Ubicaci¢n,248.80000000000004,180.0
+P4,C,Ubicaci¢n,348.8000000000002,158.39999999999998
+P5,D,Ubicaci¢n,456.80000000000007,166.39999999999998
+P6,F,Ubicaci¢n,360.0,360.8
 J,Boca Chica,Playa,900.0,300.0

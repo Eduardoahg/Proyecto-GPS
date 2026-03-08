@@ -7,15 +7,14 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class TransporteController {
     @FXML private VBox panelInicio;
@@ -54,21 +53,13 @@ public class TransporteController {
         String criterio = cbCriterio.getValue();
 
         // 1. VALIDACIÓN: Ahora incluimos el Costo en el mensaje
-        if (origen == null || origen.isEmpty()) {
-            log.appendText("Error: Debe seleccionar una parada de origen.\n");
-            return;
-        }
-        if (destino == null || destino.isEmpty()) {
-            log.appendText("Error: Debe seleccionar una parada de destino.\n");
-            return;
-        }
-        if (criterio == null) {
-            log.appendText("Error: Seleccione un criterio (Tiempo, Distancia, Transbordos o Costo).\n");
+        if (origen == null || origen.isEmpty() || destino == null ||
+                destino.isEmpty() || criterio == null) {
+            log.appendText("Error: Complete los campos de origen, destino y criterio.\n");
             return;
         }
 
         rutaResaltada = sistema.calcularRutaDijkstra(origen, destino, criterio);
-
         if (rutaResaltada.isEmpty()) {
             log.appendText("No hay conexión entre paradas.\n");
         } else {
@@ -92,13 +83,19 @@ public class TransporteController {
                     unidad = " unidades";
             }
 
-            log.appendText("\n--- RESULTADO ---\n");
-            log.appendText("Ruta: ");
+            log.appendText("\n--- MEJOR RUTA (" + criterio.toUpperCase() + ") ---\n");
             for (int i = 0; i < rutaResaltada.size(); i++) {
                 log.appendText(rutaResaltada.get(i).getNombre() + (i < rutaResaltada.size() - 1 ? " -> " : ""));
             }
+            log.appendText("\nTotal: " + String.format("%.2f", valorTotal) + unidad + "\n");
 
-            log.appendText("\nTotal " + criterio + ": " + String.format("%.2f", valorTotal) + unidad + "\n");
+            List<String> alternativas = sistema.buscarRutasAlternativas(origen, destino);
+            if (alternativas.size() > 1) {
+                log.appendText("\n--- OTRAS RUTAS POSIBLES ---\n");
+                for (int i = 1; i < alternativas.size(); i++) {
+                    log.appendText("Opción " + i + ": " + alternativas.get(i) + "\n");
+                }
+            }
         }
         dibujarEnCanvas(canvasMapa, rutaResaltada);
     }
@@ -170,33 +167,44 @@ public class TransporteController {
 
     @FXML
     private void clicEditor(MouseEvent e) {
+        Parada pBuscada = buscarParadaPorCoordenada(e.getX(), e.getY());
+
         if (e.getButton() == MouseButton.SECONDARY) {
-            Parada aBorrar = buscarParadaPorCoordenada(e.getX(), e.getY());
-            if (aBorrar != null) {
-                sistema.eliminarParada(aBorrar.getId());
-                log.appendText("Eliminada: " + aBorrar.getNombre() + "\n");
+            if (pBuscada != null) {
+                sistema.eliminarParada(pBuscada.getId());
+                log.appendText("Eliminada: " + pBuscada.getNombre() + "\n");
                 dibujarEnCanvas(canvasEditor, null);
             }
             return;
         }
 
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setTitle("Gestión de Parada");
-        dialog.setHeaderText("Nueva Parada");
-        dialog.setContentText("Ingrese el nombre de la parada:");
+        if (e.getClickCount() == 2 && pBuscada != null) {
+            TextInputDialog dialog = new TextInputDialog(pBuscada.getNombre());
+            dialog.setTitle("Modificar Parada");
+            dialog.setHeaderText("Cambiando nombre a la parada " + pBuscada.getId());
+            dialog.setContentText("Nuevo nombre:");
+            dialog.showAndWait().ifPresent(nuevo -> {
+                if (!nuevo.trim().isEmpty()) {
+                    sistema.modificarParada(pBuscada.getId(), nuevo.trim());
+                    dibujarEnCanvas(canvasEditor, null);
+                }
+            });
+            return;
+        }
 
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(nombre -> {
-            if (nombre.trim().isEmpty()) {
-                log.appendText("Error: El nombre de la parada no puede estar vacío.\n");
-                return;
-            }
-
-            String id = "P" + (sistema.getGrafo().size() + 1);
-            Parada nueva = new Parada(id, nombre.trim(), "Ubicación", e.getX(), e.getY());
-            sistema.agregarParada(nueva);
-            dibujarEnCanvas(canvasEditor, null);
-        });
+        if (e.getClickCount() == 1 && pBuscada == null) {
+            TextInputDialog dialog = new TextInputDialog("");
+            dialog.setTitle("Nueva Parada");
+            dialog.setHeaderText("Creando parada en (" + (int)e.getX() + ", " + (int)e.getY() + ")");
+            dialog.setContentText("Nombre:");
+            dialog.showAndWait().ifPresent(nombre -> {
+                if (!nombre.trim().isEmpty()) {
+                    String id = "P" + (sistema.getGrafo().size() + 1);
+                    sistema.agregarParada(new Parada(id, nombre.trim(), "Ubicación", e.getX(), e.getY()));
+                    dibujarEnCanvas(canvasEditor, null);
+                }
+            });
+        }
     }
 
     @FXML
@@ -211,18 +219,21 @@ public class TransporteController {
             double distPixeles = Math.sqrt(Math.pow(paradaDesde.getX() - paradaHacia.getX(), 2) +
                     Math.pow(paradaDesde.getY() - paradaHacia.getY(), 2));
 
-            double distReal = distPixeles / 20.0; //Hola
+            double distReal = distPixeles / 20.0;
             double tiempo = (distReal / 30.0) * 60.0;
-            double costo = distReal * 3.5;
+
+            double costo;
+            if (distReal <= 7.0) {
+                costo = 80.0;
+            } else {
+                costo = 80.0 + (distReal - 7.0) * 15.0;
+            }
+
             boolean necesitaTrasbordo = distReal > 10.0;
 
-            if (distReal > 0 && tiempo > 0) {
-                sistema.agregarRuta(paradaDesde.getId(), paradaHacia.getId(), tiempo, distReal, costo, necesitaTrasbordo);
-                log.appendText("Ruta creada: " + paradaDesde.getNombre() + " -> " + paradaHacia.getNombre() + " (" + String.format("%.2f", distReal) + " km)\n");
-                dibujarEnCanvas(canvasEditor, null);
-            } else {
-                log.appendText("Error: La distancia entre paradas es demasiado corta.\n");
-            }
+            sistema.agregarRuta(paradaDesde.getId(), paradaHacia.getId(), tiempo, distReal, costo, necesitaTrasbordo);
+            log.appendText("Ruta: " + paradaDesde.getNombre() + " -> " + paradaHacia.getNombre() + " (" + String.format("%.2f", distReal) + " km)\n");
+            dibujarEnCanvas(canvasEditor, null);
         }
     }
 
