@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class TransporteController {
+public class TransporteVisual {
     @FXML private VBox panelInicio;
     @FXML private BorderPane panelGPS;
     @FXML private Canvas canvasMapa;
@@ -67,7 +67,7 @@ public class TransporteController {
 
         log.clear();
         if (rutaMejor.isEmpty()) {
-            log.appendText("No se encontró ruta entre las paradas seleccionadas.\n");
+            log.appendText("No se encontro una ruta entre las paradas seleccionadas.\n");
         } else {
             imprimirRuta("MEJOR RUTA (VERDE)", rutaMejor, crit);
             if (!rutaSegunda.isEmpty()) {
@@ -200,7 +200,7 @@ public class TransporteController {
             dialog.showAndWait().ifPresent(nombre -> {
                 if (!nombre.trim().isEmpty()) {
                     String id = "P" + (sistema.getGrafo().size() + 1);
-                    sistema.agregarParada(new Parada(id, nombre.trim(), "Ubicación", e.getX(), e.getY()));
+                    sistema.agregarParada(new Parada(id, nombre.trim(), "Ubicacion", e.getX(), e.getY()));
                     dibujarDual(canvasEditor, new ArrayList<>(), new ArrayList<>());
                 }
             });
@@ -233,7 +233,7 @@ public class TransporteController {
 
     @FXML private void guardarEditor() {
         GestorArchivos.guardarDatos(sistema, "paradas.csv", "rutas.csv");
-        log.appendText("Cambios guardados con éxito.\n");
+        log.appendText("Cambios guardados.\n");
     }
 
     @FXML private void volverAlInicio() {

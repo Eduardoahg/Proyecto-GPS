@@ -70,10 +70,10 @@ public class GrafoTransporte {
     }
 
     // ==========================================
-    // ALGORITMOS DE OPTIMIZACIÓN [cite: 17, 56, 115]
+    // ALGORITMOS DE OPTIMIZACIÓN
     // ==========================================
 
-    // 1. DIJKSTRA: Ruta más corta por tiempo, distancia o transbordos [cite: 18, 27, 40, 118]
+    // 1. DIJKSTRA: Ruta más corta por tiempo, distancia o transbordos
     // Complejidad Espacial: O(V)
     public List<Parada> calcularRutaDijkstra(String idOri, String idDest, String criterio) {
         Parada origen = buscarParada(idOri);
@@ -133,7 +133,7 @@ public class GrafoTransporte {
         visitados.remove(actual);
     }
 
-    // 2. BELLMAN-FORD: Útil si existen costos/tarifas negativas (descuentos) [cite: 19, 119]
+    // 2. BELLMAN-FORD: Útil si existen costos/tarifas negativas (descuentos)
     public String bellmanFord(String idOrigen, String idDestino) {
         Parada origen = buscarParada(idOrigen);
         Parada destino = buscarParada(idDestino);
@@ -172,7 +172,7 @@ public class GrafoTransporte {
         return construirStringCamino("Bellman-Ford (Costo)", destino, padres, costos.get(destino));
     }
 
-    // 3. FLOYD-WARSHALL: Rutas más cortas entre todas las paradas [cite: 20, 120]
+    // 3. FLOYD-WARSHALL: Rutas más cortas entre todas las paradas
     public void floydWarshall() {
         int V = adjList.size();
         double[][] dist = new double[V][V];
