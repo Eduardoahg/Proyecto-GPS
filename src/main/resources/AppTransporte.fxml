@@ -14,7 +14,7 @@
                         <Font name="System Bold" size="48.0" />
                     </font>
                 </Label>
-                <Button mnemonicParsing="false" onAction="#entrarAlGPS" prefHeight="60.0" prefWidth="300.0" style="-fx-background-color: #e74c3c;" text="ABRIR GPS" textFill="WHITE">
+                <Button mnemonicParsing="false" onAction="#entrarAlGPS" prefHeight="60.0" prefWidth="300.0" style="-fx-background-color: #34495e;" text="ABRIR GPS" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="24.0" />
                     </font>
@@ -22,7 +22,7 @@
                 <Button onAction="#abrirEditor" prefHeight="60.0" prefWidth="300.0" style="-fx-background-color: #34495e;" text="CREAR / MODIFICAR" textAlignment="CENTER" textFill="WHITE">
                     <font>
                         <Font name="System Bold" size="24.0" />
-                    </font> //hola
+                    </font>
                 </Button>
             </children>
         </VBox>
@@ -32,9 +32,12 @@
                 <VBox spacing="10" style="-fx-padding: 20; -fx-background-color: #f4f4f4;">
                     <children>
                         <Label style="-fx-font-weight: bold;" text="EDITOR DE RED" />
-                        <Label text="Instrucciones:&#10;1. Clic Izq: Crear Parada&#10;2. Arrastrar: Crear Ruta &#10;3. Click Der: Eliminar Parada" />
+                        <Label text="Instrucciones:&#10;1. Clic Izq: Crear Parada&#10;2. Arrastrar: Crear Ruta &#10;3. Click Der: Eliminar Parada">
+                     <font>
+                        <Font size="14.0" />
+                     </font></Label>
                         <Button maxWidth="Infinity" onAction="#guardarEditor" style="-fx-background-color: #27ae60;" text="Guardar Cambios" textFill="WHITE" />
-                        <Button maxWidth="Infinity" onAction="#volverAlInicio" style="-fx-background-color: #7f8c8d;" text="Volver al Menú" textFill="WHITE" />
+                        <Button maxWidth="Infinity" onAction="#volverAlInicio" style="-fx-background-color: #7f8c8d;" text="Volver al Menu" textFill="WHITE" />
                     </children>
                 </VBox>
             </left>
@@ -65,13 +68,13 @@
                             </font>
                         </Button>
                         <Separator prefWidth="200.0" />
-                        <Label text="Resultados del Análisis">
+                        <Label text="Resultados del Analisis">
                             <font>
                                 <Font name="System Bold" size="14.0" />
                             </font>
                         </Label>
                         <TextArea fx:id="log" editable="false" prefHeight="300.0" wrapText="true" />
-                        <Button maxWidth="Infinity" onAction="#volverAlInicio" style="-fx-background-color: #7f8c8d;" text="VOLVER AL MENÚ" textFill="WHITE">
+                        <Button maxWidth="Infinity" onAction="#volverAlInicio" style="-fx-background-color: #7f8c8d;" text="VOLVER AL MENU" textFill="WHITE">
                             <font>
                                 <Font name="System Bold" size="14.0" />
                             </font>

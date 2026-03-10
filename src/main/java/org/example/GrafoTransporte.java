@@ -154,7 +154,7 @@ public class GrafoTransporte {
             if (costos.get(u) == Double.MAX_VALUE) continue;
             for (Ruta r : entry.getValue()) {
                 if (costos.get(u) + r.getCosto() < costos.get(r.getDestino())) {
-                    return "El grafo contiene un ciclo de costo negativo.";
+                    return "El grafo contiene uno costo negativo.";
                 }
             }
         }
@@ -227,7 +227,7 @@ public class GrafoTransporte {
             case "distancia":
                 return r.getDistancia();
             case "transbordos":
-                return r.isRequiereTrasbordo() ? 10.0 : 1.0;
+                return r.isRequiereTrasbordo() ? 9.0 : 1.0;
             case "costo":
                 return r.getCosto();
             default:

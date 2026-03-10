@@ -99,7 +99,7 @@ public class TransporteVisual {
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        gc.setLineWidth(2);
+        gc.setLineWidth(3);
         gc.setStroke(Color.BLACK);
         sistema.getGrafo().forEach((p, rutas) -> {
             for (Ruta r : rutas) {
@@ -217,7 +217,7 @@ public class TransporteVisual {
             double distReal = distPixeles / 20.0;
             double tiempo = (distReal / 30.0) * 60.0;
             double costo = (distReal <= 7.0) ? 80.0 : 80.0 + (distReal - 7.0) * 15.0;
-            boolean necesitaTrasbordo = distReal > 10.0;
+            boolean necesitaTrasbordo = distReal > 9.0;
 
             sistema.agregarRuta(paradaDesde.getId(), paradaHacia.getId(), tiempo, distReal, costo, necesitaTrasbordo);
             log.appendText("Ruta creada: " + paradaDesde.getNombre() + " -> " + paradaHacia.getNombre() + "\n");
