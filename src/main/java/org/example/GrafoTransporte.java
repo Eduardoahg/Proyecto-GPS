@@ -127,7 +127,7 @@ public class GrafoTransporte {
     public String bellmanFord(String idOrigen, String idDestino) {
         Parada origen = buscarParada(idOrigen);
         Parada destino = buscarParada(idDestino);
-        if (origen == null || destino == null) return "Paradas no válidas.";
+        if (origen == null || destino == null) return "Paradas no validas.";
 
         Map<Parada, Double> costos = new HashMap<>();
         Map<Parada, Parada> padres = new HashMap<>();

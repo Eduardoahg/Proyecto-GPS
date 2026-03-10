@@ -48,7 +48,8 @@ public class GestorArchivos {
                         Double.parseDouble(d[4]), Boolean.parseBoolean(d[5]));
             }
         } catch (IOException e) {
-            System.out.println("No se encontro archivo de rutas.");
+            System.out.println("No se encontro archivo de rutas");
+
         }
     }
 }
