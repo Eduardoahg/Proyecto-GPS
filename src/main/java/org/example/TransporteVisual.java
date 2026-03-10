@@ -54,7 +54,7 @@ public class TransporteVisual {
         String crit = cbCriterio.getValue();
 
         if (ori.isEmpty() || dest.isEmpty() || crit == null) {
-            log.appendText("Error: Complete los campos y el criterio.\n");
+            log.appendText("Favor completar los campos y/o criterio.\n");
             return;
         }
 
@@ -173,7 +173,7 @@ public class TransporteVisual {
 
         if (e.getButton() == MouseButton.SECONDARY && pBuscada != null) {
             sistema.eliminarParada(pBuscada.getId());
-            log.appendText("Eliminada: " + pBuscada.getNombre() + "\n");
+            log.appendText("Eliminada :) " + pBuscada.getNombre() + "\n");
             dibujarDual(canvasEditor, new ArrayList<>(), new ArrayList<>());
             return;
         }

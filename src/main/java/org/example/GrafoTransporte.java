@@ -4,16 +4,12 @@ import java.util.*;
 
 public class GrafoTransporte {
 
-    // Implementación del grafo mediante listas de adyacencia
     private Map<Parada, List<Ruta>> adjList;
 
     public GrafoTransporte() {
         this.adjList = new HashMap<>();
     }
 
-    // ==========================================
-    // GESTIÓN DE PARADAS Y RUTAS (CRUD)
-    // ==========================================
 
     public void agregarParada(Parada parada) {
         adjList.putIfAbsent(parada, new ArrayList<>());
@@ -23,7 +19,6 @@ public class GrafoTransporte {
         Parada p = buscarParada(id);
         if (p != null) {
             adjList.remove(p);
-            // Eliminar rutas huérfanas
             for (List<Ruta> rutas : adjList.values()) {
                 rutas.removeIf(r -> r.getDestino().equals(p));
             }
@@ -45,7 +40,6 @@ public class GrafoTransporte {
         }
     }
 
-    // Simulación en Tiempo Real: Ajustar tiempos por tráfico
     public void actualizarTiempoRuta(String idOrigen, String idDestino, double nuevoTiempo) {
         Parada origen = buscarParada(idOrigen);
         if (origen != null) {
@@ -69,11 +63,7 @@ public class GrafoTransporte {
         return adjList;
     }
 
-    // ==========================================
-    // ALGORITMOS DE OPTIMIZACIÓN
-    // ==========================================
 
-    // 1. DIJKSTRA: Ruta más corta por tiempo, distancia o transbordos
     // Complejidad Espacial: O(V)
     public List<Parada> calcularRutaDijkstra(String idOri, String idDest, String criterio) {
         Parada origen = buscarParada(idOri);
@@ -133,7 +123,7 @@ public class GrafoTransporte {
         visitados.remove(actual);
     }
 
-    // 2. BELLMAN-FORD: Útil si existen costos/tarifas negativas (descuentos)
+
     public String bellmanFord(String idOrigen, String idDestino) {
         Parada origen = buscarParada(idOrigen);
         Parada destino = buscarParada(idDestino);
@@ -159,7 +149,6 @@ public class GrafoTransporte {
             }
         }
 
-        // Verificación de ciclos negativos
         for (Map.Entry<Parada, List<Ruta>> entry : adjList.entrySet()) {
             Parada u = entry.getKey();
             if (costos.get(u) == Double.MAX_VALUE) continue;
@@ -172,7 +161,6 @@ public class GrafoTransporte {
         return construirStringCamino("Bellman-Ford (Costo)", destino, padres, costos.get(destino));
     }
 
-    // 3. FLOYD-WARSHALL: Rutas más cortas entre todas las paradas
     public void floydWarshall() {
         int V = adjList.size();
         double[][] dist = new double[V][V];
@@ -189,7 +177,7 @@ public class GrafoTransporte {
             int u = paradaToIndex.get(entry.getKey());
             for (Ruta r : entry.getValue()) {
                 int v = paradaToIndex.get(r.getDestino());
-                dist[u][v] = r.getTiempo(); // Ejemplo priorizando tiempo
+                dist[u][v] = r.getTiempo();
             }
         }
 
@@ -202,10 +190,8 @@ public class GrafoTransporte {
                 }
             }
         }
-        System.out.println("Matriz Floyd-Warshall calculada (Impresión omitida por espacio).");
     }
 
-    // 4. BÚSQUEDA DE RUTAS ALTERNATIVAS (Basado en DFS)
     public List<String> buscarRutasAlternativas(String idOrigen, String idDestino) {
         Parada origen = buscarParada(idOrigen);
         Parada destino = buscarParada(idDestino);
@@ -232,9 +218,8 @@ public class GrafoTransporte {
         visitados.remove(actual);
     }
 
-    // ==========================================
-    // MÉTODOS AUXILIARES
-    // ==========================================
+    // METODOS AUXILIARES
+
     private double obtenerPeso(Ruta r, String criterio) {
         switch (criterio.toLowerCase()) {
             case "tiempo":

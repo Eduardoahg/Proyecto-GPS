@@ -20,8 +20,8 @@ public class Parada {
         this.id = id;
         this.nombre = nombre;
         this.localizacion = localizacion;
-        this.x = 0; // Valor por defecto
-        this.y = 0; // Valor por defecto
+        this.x = 0;
+        this.y = 0;
     }
 
     @Override

@@ -10,7 +10,7 @@ public class AppTransporte extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/AppTransporte.fxml"));
-        stage.setTitle("GPS Transporte Público");
+        stage.setTitle("GPS Transporte Publico");
         stage.setScene(new Scene(root, 1100, 700));
         stage.show();
     }
