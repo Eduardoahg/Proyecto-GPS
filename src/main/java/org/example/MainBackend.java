@@ -34,6 +34,6 @@ public class MainBackend {
         sistema.agregarRuta("D", "J", 45.0, 30.0, 150.0, false);
 
         GestorArchivos.guardarDatos(sistema, "paradas.csv", "rutas.csv");
-        System.out.println("Archivos guardados.");
+        System.out.println("Archivos guardados :)");
     }
 }
