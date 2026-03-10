@@ -37,7 +37,7 @@ public class GestorArchivos {
                 grafo.agregarParada(p);
             }
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
-            System.out.println("Archivo de paradas vacio o desactualizado.");
+            System.out.println("Error! Archivo de paradas vacio o desactualizado.");
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(rutaRutas))) {
