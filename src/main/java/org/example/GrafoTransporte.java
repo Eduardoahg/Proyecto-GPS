@@ -2,6 +2,12 @@ package org.example;
 
 import java.util.*;
 
+/*
+   CLASE: GrafoTransporte
+   Argumentos: ninguno.
+   Objetivo: Constructor para inicializar el mapa de adyacencia del grafo.
+   Retorno: instancia de GrafoTransporte.
+*/
 public class GrafoTransporte {
 
     private Map<Parada, List<Ruta>> adjList;
@@ -10,11 +16,24 @@ public class GrafoTransporte {
         this.adjList = new HashMap<>();
     }
 
-
+    /*
+       Función: agregarParada
+       Argumentos:
+          Parada parada: Objeto parada a incluir en el grafo.
+       Objetivo: Añadir un nuevo nodo al grafo si no existe previamente.
+       Retorno: ninguno.
+    */
     public void agregarParada(Parada parada) {
         adjList.putIfAbsent(parada, new ArrayList<>());
     }
 
+    /*
+       Función: eliminarParada
+       Argumentos:
+          String id: Identificador único de la parada a borrar.
+       Objetivo: Eliminar una parada del grafo y todas las rutas que apunten a ella.
+       Retorno: ninguno.
+    */
     public void eliminarParada(String id) {
         Parada p = buscarParada(id);
         if (p != null) {
@@ -25,6 +44,18 @@ public class GrafoTransporte {
         }
     }
 
+    /*
+       Función: agregarRuta
+       Argumentos:
+          String idOrigen: ID de la parada inicial.
+          String idDestino: ID de la parada final.
+          double tiempo: Duración del trayecto.
+          double distancia: Longitud de la ruta.
+          double costo: Precio del viaje.
+          boolean trasbordo: Indica si requiere cambio de vehículo.
+       Objetivo: Crear una conexión dirigida entre dos paradas con sus atributos.
+       Retorno: ninguno.
+    */
     public void agregarRuta(String idOrigen, String idDestino, double tiempo, double distancia, double costo, boolean trasbordo) {
         Parada origen = buscarParada(idOrigen);
         Parada destino = buscarParada(idDestino);
@@ -33,6 +64,14 @@ public class GrafoTransporte {
         }
     }
 
+    /*
+       Función: modificarParada
+       Argumentos:
+          String id: ID de la parada a modificar.
+          String nuevoNombre: El nombre actualizado.
+       Objetivo: Cambiar el nombre de una parada existente.
+       Retorno: ninguno.
+    */
     public void modificarParada(String id, String nuevoNombre) {
         Parada p = buscarParada(id);
         if (p != null) {
@@ -40,6 +79,15 @@ public class GrafoTransporte {
         }
     }
 
+    /*
+       Función: actualizarTiempoRuta
+       Argumentos:
+          String idOrigen: ID del origen.
+          String idDestino: ID del destino.
+          double nuevoTiempo: El nuevo valor de tiempo.
+       Objetivo: Actualizar el tiempo de una ruta específica entre dos paradas.
+       Retorno: ninguno.
+    */
     public void actualizarTiempoRuta(String idOrigen, String idDestino, double nuevoTiempo) {
         Parada origen = buscarParada(idOrigen);
         if (origen != null) {
@@ -52,6 +100,13 @@ public class GrafoTransporte {
         }
     }
 
+    /*
+       Función: buscarParada
+       Argumentos:
+          String criterio: ID o nombre de la parada a buscar.
+       Objetivo: Localizar una parada en el grafo por sus atributos.
+       Retorno: Objeto Parada o null si no se encuentra.
+    */
     public Parada buscarParada(String criterio) {
         return adjList.keySet().stream()
                 .filter(p -> p.getId().equalsIgnoreCase(criterio) || p.getNombre().equalsIgnoreCase(criterio))
@@ -59,12 +114,25 @@ public class GrafoTransporte {
                 .orElse(null);
     }
 
+    /*
+       Función: getGrafo
+       Argumentos: ninguno.
+       Objetivo: Obtener la estructura completa del mapa de adyacencia.
+       Retorno: Map que representa el grafo.
+    */
     public Map<Parada, List<Ruta>> getGrafo() {
         return adjList;
     }
 
-
-    // Complejidad Espacial: O(V)
+    /*
+       Función: calcularRutaDijkstra
+       Argumentos:
+          String idOri: ID origen.
+          String idDest: ID destino.
+          String criterio: Atributo a optimizar (tiempo, costo, etc).
+       Objetivo: Calcular el camino más corto utilizando el algoritmo de Dijkstra.
+       Retorno: Lista de paradas que forman el camino óptimo.
+    */
     public List<Parada> calcularRutaDijkstra(String idOri, String idDest, String criterio) {
         Parada origen = buscarParada(idOri);
         Parada destino = buscarParada(idDest);
@@ -96,6 +164,14 @@ public class GrafoTransporte {
         return camino;
     }
 
+    /*
+       Función: obtenerCaminosAlternativos
+       Argumentos:
+          String idOri: ID origen.
+          String idDest: ID destino.
+       Objetivo: Encontrar múltiples rutas posibles entre dos puntos.
+       Retorno: Lista de listas de paradas.
+    */
     public List<List<Parada>> obtenerCaminosAlternativos(String idOri, String idDest) {
         Parada origen = buscarParada(idOri);
         Parada destino = buscarParada(idDest);
@@ -106,6 +182,17 @@ public class GrafoTransporte {
         return todosLosCaminos;
     }
 
+    /*
+       Función: dfsTodosLosCaminos
+       Argumentos:
+          Parada actual: Nodo donde se encuentra la búsqueda.
+          Parada destino: Nodo final.
+          Set visitados: Conjunto de nodos ya explorados.
+          List caminoActual: Ruta que se está construyendo.
+          List resultados: Acumulador de rutas encontradas.
+       Objetivo: Realizar una búsqueda en profundidad para hallar todos los caminos.
+       Retorno: ninguno.
+    */
     private void dfsTodosLosCaminos(Parada actual, Parada destino, Set<Parada> visitados, List<Parada> caminoActual, List<List<Parada>> resultados) {
         if (resultados.size() > 15) return;
         if (actual.equals(destino)) {
@@ -123,7 +210,14 @@ public class GrafoTransporte {
         visitados.remove(actual);
     }
 
-
+    /*
+       Función: bellmanFord
+       Argumentos:
+          String idOrigen: ID origen.
+          String idDestino: ID destino.
+       Objetivo: Encontrar la ruta de costo mínimo permitiendo pesos negativos.
+       Retorno: String con el resultado del camino o error de ciclos negativos.
+    */
     public String bellmanFord(String idOrigen, String idDestino) {
         Parada origen = buscarParada(idOrigen);
         Parada destino = buscarParada(idDestino);
@@ -161,6 +255,12 @@ public class GrafoTransporte {
         return construirStringCamino("Bellman-Ford (Costo)", destino, padres, costos.get(destino));
     }
 
+    /*
+       Función: floydWarshall
+       Argumentos: ninguno.
+       Objetivo: Calcular todos los caminos más cortos entre todos los pares de nodos.
+       Retorno: ninguno.
+    */
     public void floydWarshall() {
         int V = adjList.size();
         double[][] dist = new double[V][V];
@@ -192,34 +292,14 @@ public class GrafoTransporte {
         }
     }
 
-    public List<String> buscarRutasAlternativas(String idOrigen, String idDestino) {
-        Parada origen = buscarParada(idOrigen);
-        Parada destino = buscarParada(idDestino);
-        List<String> caminos = new ArrayList<>();
-        if (origen != null && destino != null) {
-            dfsAlternativas(origen, destino, new HashSet<>(), new ArrayList<>(Arrays.asList(origen.getNombre())), caminos);
-        }
-        return caminos;
-    }
-
-    private void dfsAlternativas(Parada actual, Parada destino, Set<Parada> visitados, List<String> caminoActual, List<String> caminos) {
-        if (actual.equals(destino)) {
-            caminos.add(String.join(" -> ", caminoActual));
-            return;
-        }
-        visitados.add(actual);
-        for (Ruta r : adjList.getOrDefault(actual, new ArrayList<>())) {
-            if (!visitados.contains(r.getDestino())) {
-                caminoActual.add(r.getDestino().getNombre());
-                dfsAlternativas(r.getDestino(), destino, visitados, caminoActual, caminos);
-                caminoActual.remove(caminoActual.size() - 1); // Backtracking
-            }
-        }
-        visitados.remove(actual);
-    }
-
-    // METODOS AUXILIARES
-
+    /*
+       Función: obtenerPeso
+       Argumentos:
+          Ruta r: La ruta a evaluar.
+          String criterio: Tipo de peso a extraer.
+       Objetivo: Determinar el valor numérico del peso basado en un criterio.
+       Retorno: double con el peso.
+    */
     private double obtenerPeso(Ruta r, String criterio) {
         switch (criterio.toLowerCase()) {
             case "tiempo":
@@ -235,6 +315,18 @@ public class GrafoTransporte {
         }
     }
 
+    /*
+            METODOS AUXILIARES
+     */
+
+    /*
+       Función: calcularPesoTotalCamino
+       Argumentos:
+          List camino: Lista de paradas recorridas.
+          String criterio: Atributo a sumar.
+       Objetivo: Sumar el peso total de una ruta completa.
+       Retorno: double con el acumulado.
+    */
     public double calcularPesoTotalCamino(List<Parada> camino, String criterio) {
         double total = 0;
         for (int i = 0; i < camino.size() - 1; i++) {
@@ -255,6 +347,16 @@ public class GrafoTransporte {
         return total;
     }
 
+    /*
+       Función: construirStringCamino
+       Argumentos:
+          String alg: Nombre del algoritmo usado.
+          Parada dest: Parada de destino.
+          Map padres: Mapeo de predecesores.
+          double total: Peso acumulado.
+       Objetivo: Formatear el resultado del camino en una cadena legible.
+       Retorno: String con la ruta formateada.
+    */
     private String construirStringCamino(String alg, Parada dest, Map<Parada, Parada> padres, double total) {
         if (!padres.containsKey(dest) && total == Double.MAX_VALUE) return alg + ": No hay ruta disponible.";
         List<String> camino = new ArrayList<>();

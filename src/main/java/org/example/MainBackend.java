@@ -1,6 +1,10 @@
 package org.example;
 
 public class MainBackend {
+
+    /*
+            MAIN PARA PRUEBAS
+     */
     public static void main(String[] args) {
         GrafoTransporte sistema = new GrafoTransporte();
 

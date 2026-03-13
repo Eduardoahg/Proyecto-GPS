@@ -32,6 +32,12 @@ public class TransporteVisual {
     private List<Parada> rutaMejor = new ArrayList<>();
     private List<Parada> rutaSegunda = new ArrayList<>();
 
+    /*
+       Función: initialize
+       Argumentos: ninguno.
+       Objetivo: Cargar datos iniciales y configurar los componentes de la interfaz al arrancar.
+       Retorno: ninguno.
+    */
     @FXML
     public void initialize() {
         GestorArchivos.cargarDatos(sistema, "paradas.csv", "rutas.csv");
@@ -40,6 +46,12 @@ public class TransporteVisual {
         panelEditor.setVisible(false);
     }
 
+    /*
+       Función: entrarAlGPS
+       Argumentos: ninguno.
+       Objetivo: Cambiar la vista al panel del GPS y limpiar el historial.
+       Retorno: ninguno.
+    */
     @FXML private void entrarAlGPS() {
         log.clear();
         panelInicio.setVisible(false);
@@ -47,6 +59,12 @@ public class TransporteVisual {
         dibujarDual(canvasMapa, new ArrayList<>(), new ArrayList<>());
     }
 
+    /*
+       Función: ejecutarCalculo
+       Argumentos: ninguno.
+       Objetivo: Procesar la búsqueda de la mejor y segunda mejor ruta según el criterio seleccionado.
+       Retorno: ninguno.
+    */
     @FXML
     private void ejecutarCalculo() {
         String ori = txtOrigen.getText();
@@ -77,6 +95,15 @@ public class TransporteVisual {
         dibujarDual(canvasMapa, rutaMejor, rutaSegunda);
     }
 
+    /*
+       Función: imprimirRuta
+       Argumentos:
+          String titulo: Encabezado de la ruta.
+          List camino: Lista de paradas a imprimir.
+          String crit: Criterio utilizado para el cálculo.
+       Objetivo: Mostrar en el log los detalles del camino y su peso total.
+       Retorno: ninguno.
+    */
     private void imprimirRuta(String titulo, List<Parada> camino, String crit) {
         double peso = sistema.calcularPesoTotalCamino(camino, crit);
         String unidad = switch (crit.toLowerCase()) {
@@ -94,6 +121,15 @@ public class TransporteVisual {
         log.appendText("\nTotal: " + String.format("%.2f", peso) + unidad + "\n\n");
     }
 
+    /*
+       Función: dibujarDual
+       Argumentos:
+          Canvas canvas: El lienzo donde se va a dibujar.
+          List principal: Camino resaltado en verde.
+          List secundaria: Camino resaltado en amarillo.
+       Objetivo: Renderizar el grafo y los caminos seleccionados en el mapa.
+       Retorno: ninguno.
+    */
     private void dibujarDual(Canvas canvas, List<Parada> principal, List<Parada> secundaria) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.WHITE);
@@ -142,6 +178,13 @@ public class TransporteVisual {
         }
     }
 
+    /*
+       Función: seleccionarParada
+       Argumentos:
+          MouseEvent event: Evento del ratón.
+       Objetivo: Identificar una parada por clic para llenar los campos de origen y destino.
+       Retorno: ninguno.
+    */
     @FXML
     private void seleccionarParada(MouseEvent event) {
         double mouseX = event.getX();
@@ -160,6 +203,12 @@ public class TransporteVisual {
         }
     }
 
+    /*
+       Función: abrirEditor
+       Argumentos: ninguno.
+       Objetivo: Cambiar la vista al modo edición del mapa.
+       Retorno: ninguno.
+    */
     @FXML private void abrirEditor() {
         log.clear();
         panelInicio.setVisible(false);
@@ -167,6 +216,13 @@ public class TransporteVisual {
         dibujarDual(canvasEditor, new ArrayList<>(), new ArrayList<>());
     }
 
+    /*
+       Función: clicEditor
+       Argumentos:
+          MouseEvent e: Evento del ratón.
+       Objetivo: Manejar la creación, modificación y eliminación de paradas mediante clics.
+       Retorno: ninguno.
+    */
     @FXML
     private void clicEditor(MouseEvent e) {
         Parada pBuscada = buscarParadaPorCoordenada(e.getX(), e.getY());
@@ -207,8 +263,22 @@ public class TransporteVisual {
         }
     }
 
+    /*
+       Función: presionarEditor
+       Argumentos:
+          MouseEvent e: Evento del ratón.
+       Objetivo: Detectar la parada de inicio al presionar para crear una ruta.
+       Retorno: ninguno.
+    */
     @FXML private void presionarEditor(MouseEvent e) { paradaDesde = buscarParadaPorCoordenada(e.getX(), e.getY()); }
 
+    /*
+       Función: soltarEditor
+       Argumentos:
+          MouseEvent e: Evento del ratón.
+       Objetivo: Detectar la parada final al soltar el ratón y crear la conexión entre ambas.
+       Retorno: ninguno.
+    */
     @FXML
     private void soltarEditor(MouseEvent e) {
         Parada paradaHacia = buscarParadaPorCoordenada(e.getX(), e.getY());
@@ -225,17 +295,37 @@ public class TransporteVisual {
         }
     }
 
+    /*
+       Función: buscarParadaPorCoordenada
+       Argumentos:
+          double x: Coordenada X.
+          double y: Coordenada Y.
+       Objetivo: Encontrar una parada cercana a las coordenadas dadas.
+       Retorno: Objeto Parada o null si no existe.
+    */
     private Parada buscarParadaPorCoordenada(double x, double y) {
         return sistema.getGrafo().keySet().stream()
                 .filter(p -> Math.sqrt(Math.pow(x - p.getX(), 2) + Math.pow(y - p.getY(), 2)) < 15)
                 .findFirst().orElse(null);
     }
 
+    /*
+       Función: guardarEditor
+       Argumentos: ninguno.
+       Objetivo: Persistir los cambios realizados en el editor a los archivos CSV.
+       Retorno: ninguno.
+    */
     @FXML private void guardarEditor() {
         GestorArchivos.guardarDatos(sistema, "paradas.csv", "rutas.csv");
         log.appendText("Cambios guardados.\n");
     }
 
+    /*
+       Función: volverAlInicio
+       Argumentos: ninguno.
+       Objetivo: Regresar a la pantalla de inicio de la aplicación.
+       Retorno: ninguno.
+    */
     @FXML private void volverAlInicio() {
         panelGPS.setVisible(false);
         panelEditor.setVisible(false);

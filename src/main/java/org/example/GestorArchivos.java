@@ -5,6 +5,16 @@ import java.util.Map;
 import java.util.List;
 
 public class GestorArchivos {
+
+    /*
+       Función: guardarDatos
+       Argumentos:
+          GrafoTransporte grafo: El objeto que contiene la red de transporte.
+          String rutaParadas: Ruta del archivo para almacenar las paradas.
+          String rutaRutas: Ruta del archivo para almacenar las conexiones.
+       Objetivo: Persistir la información del grafo en archivos de texto plano.
+       Retorno: ninguno.
+    */
     public static void guardarDatos(GrafoTransporte grafo, String rutaParadas, String rutaRutas) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(rutaParadas))) {
             for (Parada p : grafo.getGrafo().keySet()) {
@@ -28,6 +38,15 @@ public class GestorArchivos {
         }
     }
 
+    /*
+       Función: cargarDatos
+       Argumentos:
+          GrafoTransporte grafo: El grafo donde se cargarán los datos.
+          String rutaParadas: Ruta del archivo de origen de las paradas.
+          String rutaRutas: Ruta del archivo de origen de las conexiones.
+       Objetivo: Leer los archivos y reconstruir la estructura del grafo en memoria.
+       Retorno: ninguno.
+    */
     public static void cargarDatos(GrafoTransporte grafo, String rutaParadas, String rutaRutas) {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaParadas))) {
             String linea;
