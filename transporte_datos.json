@@ -1,0 +1,247 @@
+[ {
+  "parada" : {
+    "id" : "P1",
+    "nombre" : "EST1",
+    "localizacion" : "Urbana",
+    "x" : 149.0,
+    "y" : 92.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P5",
+      "nombre" : "EST5",
+      "localizacion" : "Urbana",
+      "x" : 164.0,
+      "y" : 364.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+}, {
+  "parada" : {
+    "id" : "P2",
+    "nombre" : "EST2",
+    "localizacion" : "Urbana",
+    "x" : 258.0,
+    "y" : 137.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P6",
+      "nombre" : "EST6",
+      "localizacion" : "Urbana",
+      "x" : 521.0,
+      "y" : 294.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+}, {
+  "parada" : {
+    "id" : "P3",
+    "nombre" : "EST3",
+    "localizacion" : "Urbana",
+    "x" : 665.0,
+    "y" : 603.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P4",
+      "nombre" : "EST4",
+      "localizacion" : "Urbana",
+      "x" : 410.0,
+      "y" : 475.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  }, {
+    "destino" : {
+      "id" : "P6",
+      "nombre" : "EST6",
+      "localizacion" : "Urbana",
+      "x" : 521.0,
+      "y" : 294.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+}, {
+  "parada" : {
+    "id" : "P4",
+    "nombre" : "EST4",
+    "localizacion" : "Urbana",
+    "x" : 410.0,
+    "y" : 475.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P8",
+      "nombre" : "EST9",
+      "localizacion" : "Urbana",
+      "x" : 344.0,
+      "y" : 271.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  }, {
+    "destino" : {
+      "id" : "P6",
+      "nombre" : "EST6",
+      "localizacion" : "Urbana",
+      "x" : 521.0,
+      "y" : 294.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+}, {
+  "parada" : {
+    "id" : "P5",
+    "nombre" : "EST5",
+    "localizacion" : "Urbana",
+    "x" : 164.0,
+    "y" : 364.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P2",
+      "nombre" : "EST2",
+      "localizacion" : "Urbana",
+      "x" : 258.0,
+      "y" : 137.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  }, {
+    "destino" : {
+      "id" : "P9",
+      "nombre" : "EST10",
+      "localizacion" : "Urbana",
+      "x" : 122.0,
+      "y" : 524.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+}, {
+  "parada" : {
+    "id" : "P6",
+    "nombre" : "EST6",
+    "localizacion" : "Urbana",
+    "x" : 521.0,
+    "y" : 294.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P7",
+      "nombre" : "EST7",
+      "localizacion" : "Urbana",
+      "x" : 515.0,
+      "y" : 121.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+}, {
+  "parada" : {
+    "id" : "P7",
+    "nombre" : "EST7",
+    "localizacion" : "Urbana",
+    "x" : 515.0,
+    "y" : 121.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P2",
+      "nombre" : "EST2",
+      "localizacion" : "Urbana",
+      "x" : 258.0,
+      "y" : 137.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+}, {
+  "parada" : {
+    "id" : "P8",
+    "nombre" : "EST9",
+    "localizacion" : "Urbana",
+    "x" : 344.0,
+    "y" : 271.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P2",
+      "nombre" : "EST2",
+      "localizacion" : "Urbana",
+      "x" : 258.0,
+      "y" : 137.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+}, {
+  "parada" : {
+    "id" : "P9",
+    "nombre" : "EST10",
+    "localizacion" : "Urbana",
+    "x" : 122.0,
+    "y" : 524.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P8",
+      "nombre" : "EST9",
+      "localizacion" : "Urbana",
+      "x" : 344.0,
+      "y" : 271.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+}, {
+  "parada" : {
+    "id" : "P10",
+    "nombre" : "EST11",
+    "localizacion" : "Urbana",
+    "x" : 643.0,
+    "y" : 183.0
+  },
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P7",
+      "nombre" : "EST7",
+      "localizacion" : "Urbana",
+      "x" : 515.0,
+      "y" : 121.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 5.0,
+    "costo" : 80.0,
+    "requiereTrasbordo" : false
+  } ]
+} ]
