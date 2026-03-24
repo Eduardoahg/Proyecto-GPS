@@ -27,6 +27,8 @@ public class TransporteVisual {
 
     private GrafoTransporte sistema = new GrafoTransporte();
     private AlgDijkstra buscador = new AlgDijkstra();
+    private VisualizadorGrafo visualizador;
+
     private Parada paradaDesde;
     private Parada paradaSeleccionada;
     private boolean hayCambiosSinGuardar = false;
@@ -36,11 +38,14 @@ public class TransporteVisual {
     public void initialize() {
         GestorArchivos.cargarDesdeJson(sistema, FILE_JSON);
         cbCriterio.getItems().addAll("Tiempo", "Distancia", "Transbordos", "Costo");
-        volverAlInicio();
-    }
 
-    public boolean isHayCambiosSinGuardar() {
-        return hayCambiosSinGuardar;
+        // Inicializamos el visualizador de SmartGraph
+        visualizador = new VisualizadorGrafo(sistema);
+
+        // Lo colocamos en el centro para que brille
+        panelGPS.setCenter(visualizador.getPanel());
+
+        volverAlInicio();
     }
 
     @FXML
@@ -50,36 +55,58 @@ public class TransporteVisual {
         String crit = cbCriterio.getValue();
 
         if (ori.isEmpty() || dest.isEmpty() || crit == null) {
-            log.appendText("Error: Complete los campos.\n");
+            log.appendText("Error: Llena todos los campos, montro.\n");
             return;
         }
 
         List<Parada> camino = buscador.ejecutar(sistema, ori, dest, crit);
         log.clear();
+
         if (camino.isEmpty()) {
-            log.appendText("No se encontró ruta.\n");
+            log.appendText("No hay ruta de " + ori + " a " + dest + ".\n");
         } else {
-            log.appendText("Ruta óptima hallada.\n");
+            log.appendText("¡Ruta óptima hallada!\n");
+            log.appendText("Paradas: " + camino.size() + "\n");
+            visualizador.resaltarCamino(camino);
         }
-        dibujarGrafo(canvasMapa, camino);
     }
 
-    // --- MÉTODOS DEL EDITOR (INTERACTIVIDAD) ---
+    @FXML
+    private void entrarAlGPS() {
+        panelInicio.setVisible(false);
+        panelGPS.setVisible(true);
+        // Despierta la física del grafo
+        visualizador.getPanel().init();
+    }
+
+    // --- EL FIX: Este es el método que te faltaba y hacía que la app crasheara ---
+    @FXML
+    private void seleccionarParada(MouseEvent event) {
+        // Buscamos si el clic fue cerca de una parada (usando la lógica del Canvas)
+        Parada p = buscarParadaPorCoordenada(event.getX(), event.getY());
+        if (p != null) {
+            if (txtOrigen.getText().isEmpty()) {
+                txtOrigen.setText(p.getNombre());
+            } else {
+                txtDestino.setText(p.getNombre());
+            }
+        }
+    }
+
+    // --- MÉTODOS DEL EDITOR ---
 
     @FXML
     private void clicEditor(MouseEvent e) {
         Parada pBuscada = buscarParadaPorCoordenada(e.getX(), e.getY());
 
-        // ELIMINAR: Clic derecho
         if (e.getButton() == MouseButton.SECONDARY && pBuscada != null) {
             sistema.eliminarParada(pBuscada.getId());
             hayCambiosSinGuardar = true;
-            log.appendText("Parada eliminada: " + pBuscada.getNombre() + "\n");
-            dibujarGrafo(canvasEditor, null);
+            log.appendText("Eliminada: " + pBuscada.getNombre() + "\n");
+            actualizarGrafos();
             return;
         }
 
-        // MODIFICAR: Doble clic
         if (e.getClickCount() == 2 && pBuscada != null) {
             TextInputDialog dialog = new TextInputDialog(pBuscada.getNombre());
             dialog.setTitle("Modificar Parada");
@@ -87,12 +114,11 @@ public class TransporteVisual {
             dialog.showAndWait().ifPresent(nuevo -> {
                 sistema.modificarParada(pBuscada.getId(), nuevo);
                 hayCambiosSinGuardar = true;
-                dibujarGrafo(canvasEditor, null);
+                actualizarGrafos();
             });
             return;
         }
 
-        // AGREGAR: Clic izquierdo en vacío
         if (pBuscada == null && e.getButton() == MouseButton.PRIMARY) {
             TextInputDialog dialog = new TextInputDialog("");
             dialog.setTitle("Nueva Parada");
@@ -101,9 +127,13 @@ public class TransporteVisual {
                 String id = "P" + (sistema.getGrafo().size() + 1);
                 sistema.agregarParada(new Parada(id, nombre, "Urbana", e.getX(), e.getY()));
                 hayCambiosSinGuardar = true;
-                dibujarGrafo(canvasEditor, null);
+                actualizarGrafos();
             });
         }
+    }
+
+    private void actualizarGrafos() {
+        dibujarGrafo(canvasEditor, null);
     }
 
     @FXML
@@ -125,27 +155,13 @@ public class TransporteVisual {
     @FXML
     private void soltarEditor(MouseEvent e) {
         Parada paradaHacia = buscarParadaPorCoordenada(e.getX(), e.getY());
-        // Crear ruta si soltamos sobre otra parada
         if (paradaDesde != null && paradaHacia != null && !paradaDesde.equals(paradaHacia)) {
             sistema.agregarRuta(paradaDesde.getId(), paradaHacia.getId(), 10.0, 5.0, 80.0, false);
             hayCambiosSinGuardar = true;
-            log.appendText("Ruta conectada.\n");
-            dibujarGrafo(canvasEditor, null);
+            actualizarGrafos();
         }
         paradaSeleccionada = null;
         paradaDesde = null;
-    }
-
-    @FXML
-    private void seleccionarParada(MouseEvent event) {
-        Parada p = buscarParadaPorCoordenada(event.getX(), event.getY());
-        if (p != null) {
-            if (txtOrigen.getText().isEmpty()) {
-                txtOrigen.setText(p.getNombre());
-            } else {
-                txtDestino.setText(p.getNombre());
-            }
-        }
     }
 
     private Parada buscarParadaPorCoordenada(double x, double y) {
@@ -156,10 +172,11 @@ public class TransporteVisual {
 
     private void dibujarGrafo(Canvas canvas, List<Parada> resaltar) {
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setFill(Color.WHITE);
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setFill(Color.web("#f4f4f4"));
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        gc.setStroke(Color.BLACK);
+        gc.setStroke(Color.GRAY);
         gc.setLineWidth(1);
         sistema.getGrafo().forEach((p, rutas) -> {
             for (Ruta r : rutas) {
@@ -168,10 +185,10 @@ public class TransporteVisual {
         });
 
         for (Parada p : sistema.getGrafo().keySet()) {
-            gc.setFill(resaltar != null && resaltar.contains(p) ? Color.LIMEGREEN : Color.RED);
-            gc.fillOval(p.getX() - 10, p.getY() - 10, 20, 20);
+            gc.setFill(resaltar != null && resaltar.contains(p) ? Color.LIMEGREEN : Color.TOMATO);
+            gc.fillOval(p.getX() - 8, p.getY() - 8, 16, 16);
             gc.setFill(Color.BLACK);
-            gc.fillText(p.getNombre(), p.getX() + 12, p.getY() + 5);
+            gc.fillText(p.getNombre(), p.getX() + 10, p.getY() + 3);
         }
     }
 
@@ -180,13 +197,25 @@ public class TransporteVisual {
         GestorArchivos.guardarEnJson(sistema, FILE_JSON);
         hayCambiosSinGuardar = false;
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Éxito");
-        alert.setHeaderText(null);
-        alert.setContentText("Cambios guardados con éxito.");
-        alert.showAndWait();
+        alert.setContentText("¡Datos guardados!");
+        alert.show();
     }
 
-    @FXML private void abrirEditor() { panelInicio.setVisible(false); panelEditor.setVisible(true); dibujarGrafo(canvasEditor, null); }
-    @FXML private void volverAlInicio() { panelGPS.setVisible(false); panelEditor.setVisible(false); panelInicio.setVisible(true); }
-    @FXML private void entrarAlGPS() { panelInicio.setVisible(false); panelGPS.setVisible(true); dibujarGrafo(canvasMapa, null); }
+    public boolean isHayCambiosSinGuardar() {
+        return hayCambiosSinGuardar;
+    }
+
+    @FXML
+    private void abrirEditor() {
+        panelInicio.setVisible(false);
+        panelEditor.setVisible(true);
+        dibujarGrafo(canvasEditor, null);
+    }
+
+    @FXML
+    private void volverAlInicio() {
+        panelGPS.setVisible(false);
+        panelEditor.setVisible(false);
+        panelInicio.setVisible(true);
+    }
 }
