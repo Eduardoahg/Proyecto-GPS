@@ -11,6 +11,7 @@ import structure.GrafoTransporte;
 
 import java.util.List;
 
+
 // Esta clase conecta tu lógica de transporte con la librería visual
 public class VisualizadorGrafo {
 
