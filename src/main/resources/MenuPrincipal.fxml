@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<VBox alignment="CENTER" spacing="30.0" style="-fx-background-color: #0B5563;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.TransporteVisual">
+    <children>
+        <Label text="GPS PUCMM " textFill="#A2BCE0">
+            <font>
+                <Font name="System Bold" size="32.0" />
+            </font>
+        </Label>
+        <VBox alignment="CENTER" spacing="15.0">
+            <children>
+                <Button onAction="#entrarAlGPS" prefHeight="50.0" prefWidth="250.0" style="-fx-background-color: #5299D3; -fx-text-fill: white;" text="1. ENTRAR AL GPS">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Button>
+                <Button onAction="#abrirEditor" prefHeight="50.0" prefWidth="250.0" style="-fx-background-color: #5299D3; -fx-text-fill: white;" text="2. EDITAR RED">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Button>
+                <Button onAction="#salirApp" prefHeight="50.0" prefWidth="250.0" style="-fx-background-color: #5E5C6C; -fx-text-fill: white;" text="3. SALIR">
+                    <font>
+                        <Font name="System Bold" size="14.0" />
+                    </font>
+                </Button>
+            </children>
+        </VBox>
+    </children>
+</VBox>

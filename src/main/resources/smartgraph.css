@@ -20,10 +20,10 @@ This should help you understand which styles you can apply to each type of eleme
 }
 
 .vertex {
-    -fx-stroke-width: 3;
-    -fx-stroke: #61B5F1;
+    -fx-stroke-width: 2;
+    -fx-stroke: #CBDF90;
     -fx-stroke-type: inside; /* you should keep this if using arrows; it will keep the shape radius consistent. */
-    -fx-fill: #B1DFF7;
+    -fx-fill: black;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 8, 0.2, 0, 4);
 }
 
@@ -39,7 +39,7 @@ This should help you understand which styles you can apply to each type of eleme
 }
 
 .vertex-label:hover {
-    -fx-background-color: white;
+    -fx-background-color: transparent;
     -fx-background-radius: 5;
     -fx-border-radius: 5;
     -fx-border-color: black;
@@ -47,11 +47,11 @@ This should help you understand which styles you can apply to each type of eleme
 
 .edge {
     -fx-stroke-width: 2;
-    -fx-stroke: #FF6D66;  
-    -fx-stroke-dash-array: 2 5 2 5; /* remove for clean lines */
-    -fx-fill: transparent; /* important to keep for curved edges */
+    -fx-stroke: black;
+    -fx-stroke-dash-array: true; /* remove for clean lines */
+    -fx-fill: black; /* important to keep for curved edges */
     -fx-stroke-line-cap: round;
-    -fx-opacity: 0.8;
+    -fx-opacity: 1.0;
 }
 
 .edge:hover {
@@ -61,7 +61,7 @@ This should help you understand which styles you can apply to each type of eleme
 .edge-label {
     -fx-font: normal 5pt "sans-serif";
     -fx-fill: white;
-    -fx-background-color: red;
+    -fx-background-color: transparent;
     -fx-background-radius: 0;
     -fx-border-color: black;
     -fx-padding: 2px;
@@ -110,3 +110,25 @@ This should help you understand which styles you can apply to each type of eleme
     -fx-stroke: #B8860B;
     -fx-stroke-width: 3;
 }
+
+.root {
+    -fx-background-color: #f4f4f4;
+}
+
+.side-panel {
+    -fx-background-color: #1B4079;
+    -fx-padding: 20;
+}
+
+.button {
+    -fx-background-color: #CBDF90;
+    -fx-text-fill: #1B4079;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5;
+}
+
+.button:hover {
+    -fx-background-color: #7F9C96;
+    -fx-text-fill: white;
+}
+

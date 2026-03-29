@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<HBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.TransporteVisual">
+    <children>
+        <VBox prefWidth="300.0" spacing="15.0" style="-fx-background-color: #0B5563; -fx-padding: 20;">
+            <children>
+                <Label style="-fx-font-weight: bold; -fx-font-size: 18;" text="EDITOR DE RED" textFill="WHITE" />
+                <TextArea fx:id="logEditor" editable="false" prefHeight="200.0" text="1-Clic Izq para crear Parada&#10;2-Shift + Clic Izq para crear ruta (arrastrar de parada a parada)&#10;3-Clic Der para Eliminar Parada" wrapText="true" />
+                <Button onAction="#guardarEditor" prefWidth="Infinity" style="-fx-background-color: #5299D3; -fx-text-fill: white;" text="Guardar Cambios" />
+                <Button onAction="#actualizarMapa" prefWidth="Infinity" style="-fx-background-color: #BEB8EB; -fx-text-fill: #5E5C6C;" text="🔄 Actualizar Mapa" />
+                <Button onAction="#volverAlInicio" prefWidth="Infinity" style="-fx-background-color: #A2BCE0; -fx-text-fill: #5E5C6C;" text="Volver al Menú" />
+            </children>
+        </VBox>
+        <StackPane style="-fx-background-color: white;" HBox.hgrow="ALWAYS">
+            <children>
+                <Canvas fx:id="canvasEditor" height="800.0" onMouseClicked="#clicEditor" onMouseDragged="#arrastrarEnEditor" onMousePressed="#presionarEditor" onMouseReleased="#soltarEditor" width="1200.0" />
+            </children>
+        </StackPane>
+    </children>
+</HBox>

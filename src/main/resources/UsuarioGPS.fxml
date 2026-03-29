@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<HBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.TransporteVisual">
+    <children>
+        <VBox prefWidth="350.0" spacing="15.0" style="-fx-background-color: #0B5563; -fx-padding: 20;">
+            <children>
+                <Label text="CONFIGURACIÓN DE RUTA" textFill="WHITE" />
+                <TextField fx:id="txtOrigen" promptText="Origen (o clic en mapa)" />
+                <TextField fx:id="txtDestino" promptText="Destino (o clic en mapa)" />
+                <ComboBox fx:id="cbCriterio" prefWidth="Infinity" promptText="Seleccione Criterio" />
+                <Button onAction="#ejecutarCalculo" prefWidth="Infinity" style="-fx-background-color: #5299D3; -fx-text-fill: white;" text="Calcular Ruta Óptima" />
+                <TextArea fx:id="log" editable="false" prefHeight="154.0" prefWidth="310.0" VBox.vgrow="ALWAYS" />
+                <HBox spacing="10">
+                    <Button onAction="#actualizarMapa" style="-fx-background-color: #BEB8EB; -fx-text-fill: #5E5C6C; -fx-font-size: 10;" text="🔄 Actualizar Mapa" />
+                    <Button onAction="#volverAlInicio" style="-fx-background-color: #A2BCE0; -fx-text-fill: #5E5C6C;" text="Menú Principal" />
+                </HBox>
+            </children>
+        </VBox>
+        <BorderPane fx:id="panelGPS" style="-fx-background-color: #A2BCE0;" HBox.hgrow="ALWAYS" />
+    </children>
+</HBox>

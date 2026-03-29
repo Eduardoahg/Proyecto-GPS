@@ -12,7 +12,6 @@ public class GrafoTransporte {
         adjList.putIfAbsent(parada, new ArrayList<>());
     }
 
-    // --- ESTE ES EL MÉTODO QUE TE FALTABA ---
     public void modificarParada(String id, String nuevoNombre) {
         Parada p = buscarParada(id);
         if (p != null) {
@@ -24,7 +23,6 @@ public class GrafoTransporte {
         Parada p = buscarParada(id);
         if (p != null) {
             adjList.remove(p);
-            // También eliminamos cualquier ruta que fuera hacia esa parada
             adjList.values().forEach(rutas -> rutas.removeIf(r -> r.getDestino().equals(p)));
         }
     }
@@ -34,6 +32,14 @@ public class GrafoTransporte {
         Parada destino = buscarParada(idDest);
         if (origen != null && destino != null) {
             adjList.get(origen).add(new Ruta(destino, t, d, c, tr));
+        }
+    }
+
+    public void eliminarRuta(String idOri, String idDest) {
+        Parada origen = buscarParada(idOri);
+        Parada destino = buscarParada(idDest);
+        if (origen != null && destino != null && adjList.containsKey(origen)) {
+            adjList.get(origen).removeIf(r -> r.getDestino().equals(destino));
         }
     }
 

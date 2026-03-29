@@ -33,7 +33,7 @@ public class GestorArchivos {
 
     public static void cargarDesdeJson(GrafoTransporte grafo, String ruta) {
         File f = new File(ruta);
-        if (!f.exists()) return; // Si no existe, no hacemos nada (Evita el error que tenías)
+        if (!f.exists()) return; // Si no existe, no hacemos nada
 
         try {
             // Leemos la lista de entradas
@@ -46,7 +46,7 @@ public class GestorArchivos {
                 grafo.getGrafo().put(entrada.getParada(), entrada.getRutas());
             }
         } catch (IOException e) {
-            System.err.println("Error al leer el JSON (probablemente formato antiguo). Iniciando con mapa vacío.");
+            System.err.println("Error al leer el JSON. Iniciando con mapa vacío.");
         }
     }
 
