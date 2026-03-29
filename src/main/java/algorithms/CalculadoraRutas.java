@@ -5,7 +5,7 @@ import model.Parada;
 public class CalculadoraRutas {
 
     // Escala: 100 píxeles = 1 kilómetro
-    private static final double ESCALA_PX_KM = 30.0;
+    private static final double ESCALA_PX_KM = 40.0;
 
     public static double calcularDistanciaKM(Parada a, Parada b) {
         double dx = b.getX() - a.getX();

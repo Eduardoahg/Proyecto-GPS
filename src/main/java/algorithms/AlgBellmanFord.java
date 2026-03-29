@@ -8,48 +8,51 @@ import java.util.*;
 
 public class AlgBellmanFord {
 
-    public String ejecutar(GrafoTransporte grafo, String idOri, String idDest) {
+    public List<Parada> ejecutar(GrafoTransporte grafo, String idOri, String idDest, String criterio) {
         Parada origen = grafo.buscarParada(idOri);
         Parada destino = grafo.buscarParada(idDest);
-        if (origen == null || destino == null) return "Paradas no válidas.";
+        if (origen == null || destino == null) return new ArrayList<>();
 
-        Map<Parada, Double> costos = new HashMap<>();
+        Map<Parada, Double> distancias = new HashMap<>();
         Map<Parada, Parada> padres = new HashMap<>();
 
-        for (Parada p : grafo.getGrafo().keySet()) costos.put(p, Double.MAX_VALUE);
-        costos.put(origen, 0.0);
+        for (Parada p : grafo.getGrafo().keySet()) distancias.put(p, Double.MAX_VALUE);
+        distancias.put(origen, 0.0);
 
         int V = grafo.getGrafo().size();
         for (int i = 1; i < V; i++) {
             for (var entry : grafo.getGrafo().entrySet()) {
                 Parada u = entry.getKey();
-                if (costos.get(u) == Double.MAX_VALUE) continue;
+                if (distancias.get(u) == Double.MAX_VALUE) continue;
                 for (Ruta r : entry.getValue()) {
-                    if (costos.get(u) + r.getCosto() < costos.get(r.getDestino())) {
-                        costos.put(r.getDestino(), costos.get(u) + r.getCosto());
+                    double peso = obtenerPeso(r, criterio);
+                    if (distancias.get(u) + peso < distancias.get(r.getDestino())) {
+                        distancias.put(r.getDestino(), distancias.get(u) + peso);
                         padres.put(r.getDestino(), u);
                     }
                 }
             }
         }
 
-        // Detección de ciclos negativos
-        for (var entry : grafo.getGrafo().entrySet()) {
-            Parada u = entry.getKey();
-            if (costos.get(u) == Double.MAX_VALUE) continue;
-            for (Ruta r : entry.getValue()) {
-                if (costos.get(u) + r.getCosto() < costos.get(r.getDestino())) {
-                    return "El grafo contiene un ciclo de costo negativo.";
-                }
-            }
-        }
-        return formatearRuta(destino, padres, costos.get(destino));
+        return reconstruirCamino(destino, padres);
     }
 
-    private String formatearRuta(Parada dest, Map<Parada, Parada> padres, double total) {
-        if (!padres.containsKey(dest)) return "No hay ruta disponible.";
-        List<String> camino = new ArrayList<>();
-        for (Parada p = dest; p != null; p = padres.get(p)) camino.add(0, p.getNombre());
-        return "Ruta: " + String.join(" -> ", camino) + " | Costo: " + total;
+    private double obtenerPeso(Ruta r, String criterio) {
+        return switch (criterio.toLowerCase()) {
+            case "tiempo" -> r.getTiempo();
+            case "distancia" -> r.getDistancia();
+            case "transbordos" -> r.isRequiereTrasbordo() ? 9.0 : 1.0;
+            case "costo" -> r.getCosto();
+            default -> r.getDistancia();
+        };
+    }
+
+    private List<Parada> reconstruirCamino(Parada destino, Map<Parada, Parada> padres) {
+        List<Parada> camino = new ArrayList<>();
+        if (!padres.containsKey(destino)) return camino;
+        for (Parada p = destino; p != null; p = padres.get(p)) {
+            camino.add(0, p);
+        }
+        return camino;
     }
 }

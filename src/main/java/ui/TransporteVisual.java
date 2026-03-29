@@ -1,6 +1,9 @@
 package ui;
 
+import algorithms.AlgBellmanFord;
 import algorithms.AlgDijkstra;
+import algorithms.AlgFloydWarshall;
+import algorithms.AlgRecorridos;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -28,11 +31,16 @@ public class TransporteVisual {
     @FXML private TextArea log;
     @FXML private TextField txtOrigen, txtDestino;
     @FXML private ComboBox<String> cbCriterio;
+    @FXML private ComboBox<String> cbAlgoritmo;
 
     private static GrafoTransporte sistema = new GrafoTransporte();
     private static boolean hayCambiosSinGuardar = false;
 
-    private AlgDijkstra buscador = new AlgDijkstra();
+    private AlgDijkstra dijkstra = new AlgDijkstra();
+    private AlgBellmanFord bellmanFord = new AlgBellmanFord();
+    private AlgFloydWarshall floydWarshall = new AlgFloydWarshall();
+    private AlgRecorridos recorridos = new AlgRecorridos();
+
     private VisualizadorGrafo visualizador;
     private final String FILE_JSON = "transporte_datos.json";
 
@@ -46,6 +54,12 @@ public class TransporteVisual {
 
         if (cbCriterio != null) {
             cbCriterio.getItems().addAll("Tiempo", "Distancia", "Transbordos", "Costo");
+            cbCriterio.setValue("Tiempo");
+        }
+
+        if (cbAlgoritmo != null) {
+            cbAlgoritmo.getItems().addAll("Dijkstra", "Bellman-Ford", "Floyd-Warshall", "BFS", "DFS");
+            cbAlgoritmo.setValue("Dijkstra");
         }
 
         visualizador = new VisualizadorGrafo(sistema, p -> {
@@ -75,21 +89,41 @@ public class TransporteVisual {
         String ori = txtOrigen.getText();
         String dest = txtDestino.getText();
         String crit = cbCriterio.getValue();
+        String alg = cbAlgoritmo.getValue();
 
-        if (ori.isEmpty() || dest.isEmpty() || crit == null) {
-            new Alert(Alert.AlertType.WARNING, "Selecciona origen, destino y criterio").show();
+        if (ori.isEmpty() || dest.isEmpty() || crit == null || alg == null) {
+            new Alert(Alert.AlertType.WARNING, "Selecciona origen, destino, algoritmo y criterio").show();
             return;
         }
 
-        List<Parada> optima = buscador.ejecutar(sistema, ori, dest, crit);
-        List<Parada> alternativa = buscarRutaAlternativa(ori, dest, crit, optima);
+        List<Parada> optima = new ArrayList<>();
+
+        switch (alg) {
+            case "Dijkstra":
+                optima = dijkstra.ejecutar(sistema, ori, dest, crit);
+                break;
+            case "Bellman-Ford":
+                optima = bellmanFord.ejecutar(sistema, ori, dest, crit);
+                break;
+            case "Floyd-Warshall":
+                optima = floydWarshall.ejecutar(sistema, ori, dest, crit);
+                break;
+            case "BFS":
+                optima = recorridos.ejecutarBFS(sistema, ori, dest);
+                break;
+            case "DFS":
+                optima = recorridos.ejecutarDFS(sistema, ori, dest);
+                break;
+        }
+
+        List<Parada> alternativa = buscarRutaAlternativa(ori, dest, crit, optima, alg);
 
         visualizador.resaltarCaminos(optima, alternativa);
-        mostrarDetalles(optima);
+        mostrarDetalles(optima, alg);
     }
 
-    private List<Parada> buscarRutaAlternativa(String ori, String dest, String crit, List<Parada> optima) {
-        if (optima.size() < 2) return new ArrayList<>();
+    private List<Parada> buscarRutaAlternativa(String ori, String dest, String crit, List<Parada> optima, String alg) {
+        if (optima.size() < 2 || alg.equals("BFS") || alg.equals("DFS")) return new ArrayList<>();
         Parada p1 = optima.get(0);
         Parada p2 = optima.get(1);
 
@@ -97,13 +131,22 @@ public class TransporteVisual {
         Ruta temp = rutas.stream().filter(r -> r.getDestino().equals(p2)).findFirst().orElse(null);
 
         rutas.remove(temp);
-        List<Parada> alt = buscador.ejecutar(sistema, ori, dest, crit);
+
+        List<Parada> alt = new ArrayList<>();
+        switch (alg) {
+            case "Dijkstra": alt = dijkstra.ejecutar(sistema, ori, dest, crit); break;
+            case "Bellman-Ford": alt = bellmanFord.ejecutar(sistema, ori, dest, crit); break;
+            case "Floyd-Warshall": alt = floydWarshall.ejecutar(sistema, ori, dest, crit); break;
+        }
+
         if (temp != null) rutas.add(temp);
         return alt;
     }
 
-    private void mostrarDetalles(List<Parada> camino) {
+    private void mostrarDetalles(List<Parada> camino, String alg) {
         log.clear();
+        log.appendText("Algoritmo usado: " + alg + "\n");
+
         if (camino.isEmpty()) {
             log.appendText("No hay ruta disponible\n");
             return;
@@ -121,6 +164,7 @@ public class TransporteVisual {
         double costo = 80 + (km * 12) + (min * 1.1);
 
         log.appendText("--- ANÁLISIS DE RUTA ---\n");
+        log.appendText("Paradas recorridas: " + camino.size() + "\n");
         log.appendText("Distancia: " + String.format("%.2f", km) + " km\n");
         log.appendText("Tiempo: " + (min > 60 ? (int)min/60 + "h " + (int)min%60 + "m" : (int)min + "m") + "\n");
         log.appendText("Costo: $" + String.format("%.2f", costo) + " DOP\n");

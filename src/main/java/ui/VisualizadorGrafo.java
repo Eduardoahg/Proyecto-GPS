@@ -72,7 +72,7 @@ public class VisualizadorGrafo {
             graphView.init();
             inicializado = true;
             Platform.runLater(() -> {
-                    fijarPosiciones();
+                fijarPosiciones();
             });
         }
     }
@@ -89,24 +89,41 @@ public class VisualizadorGrafo {
 
     public void resaltarCaminos(List<Parada> optima, List<Parada> alternativa) {
         limpiarEstilos();
-        if (optima != null) aplicarEstiloCamino(optima, "ruta-optima");
-        if (alternativa != null) aplicarEstiloCamino(alternativa, "ruta-alternativa");
+        if (optima != null) {
+            aplicarEstiloCamino(optima, "-fx-stroke: limegreen; -fx-stroke-width: 6;");
+            aplicarEstiloNodos(optima, "-fx-fill: limegreen; -fx-stroke: black; -fx-stroke-width: 2;");
+        }
+        if (alternativa != null) {
+            aplicarEstiloCamino(alternativa, "-fx-stroke: gold; -fx-stroke-width: 4;");
+            aplicarEstiloNodos(alternativa, "-fx-fill: gold; -fx-stroke: black; -fx-stroke-width: 2;");
+        }
     }
 
-    private void aplicarEstiloCamino(List<Parada> camino, String cssClass) {
+    private void aplicarEstiloCamino(List<Parada> camino, String estilo) {
         for (int i = 0; i < camino.size() - 1; i++) {
             Parada u = camino.get(i);
             Parada v = camino.get(i + 1);
             modelGraph.edges().stream()
                     .filter(e -> e.vertices()[0].element().equals(u) && e.vertices()[1].element().equals(v))
-                    .forEach(e -> graphView.getStylableEdge(e).addStyleClass(cssClass));
+                    .forEach(e -> ((javafx.scene.Node) graphView.getStylableEdge(e)).setStyle(estilo));
+        }
+    }
+
+    private void aplicarEstiloNodos(List<Parada> camino, String estilo) {
+        for (Parada p : camino) {
+            Vertex<Parada> v = verticesMap.get(p);
+            if (v != null) {
+                ((javafx.scene.Node) graphView.getStylableVertex(v)).setStyle(estilo);
+            }
         }
     }
 
     private void limpiarEstilos() {
         modelGraph.edges().forEach(e -> {
-            graphView.getStylableEdge(e).removeStyleClass("ruta-optima");
-            graphView.getStylableEdge(e).removeStyleClass("ruta-alternativa");
+            ((javafx.scene.Node) graphView.getStylableEdge(e)).setStyle("-fx-stroke: black; -fx-stroke-width: 2;");
+        });
+        modelGraph.vertices().forEach(v -> {
+            ((javafx.scene.Node) graphView.getStylableVertex(v)).setStyle("-fx-fill: red; -fx-stroke: black; -fx-stroke-width: 2;");
         });
     }
 

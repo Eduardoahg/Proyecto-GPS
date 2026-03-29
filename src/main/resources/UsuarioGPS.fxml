@@ -8,6 +8,7 @@
                 <Label text="CONFIGURACIÓN DE RUTA" textFill="WHITE" />
                 <TextField fx:id="txtOrigen" promptText="Origen (o clic en mapa)" />
                 <TextField fx:id="txtDestino" promptText="Destino (o clic en mapa)" />
+                <ComboBox fx:id="cbAlgoritmo" prefWidth="Infinity" promptText="Seleccione Algoritmo" />
                 <ComboBox fx:id="cbCriterio" prefWidth="Infinity" promptText="Seleccione Criterio" />
                 <Button onAction="#ejecutarCalculo" prefWidth="Infinity" style="-fx-background-color: #5299D3; -fx-text-fill: white;" text="Calcular Ruta Óptima" />
                 <TextArea fx:id="log" editable="false" prefHeight="154.0" prefWidth="310.0" VBox.vgrow="ALWAYS" />
