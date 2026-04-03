@@ -8,13 +8,6 @@
     <artifactId>GPS</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-    </repositories>
-
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -34,26 +27,17 @@
             <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.36</version>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.brunomnsilva</groupId>
-            <artifactId>smartgraph</artifactId>
-            <version>2.3.0</version>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -73,7 +57,6 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>

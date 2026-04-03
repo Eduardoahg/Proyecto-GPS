@@ -12,19 +12,15 @@ import java.io.IOException;
 import java.util.*;
 
 public class GestorArchivos {
-    // Configuramos Jackson para que soporte objetos complejos como llaves de mapa
     private static final ObjectMapper mapper = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);
 
     public static void guardarEnJson(GrafoTransporte grafo, String ruta) {
         try {
-            // En lugar de guardar un Map<Parada, List<Ruta>>,
-            // guardamos una Lista de objetos "EntradaGrafo" que es 100% compatible con JSON
             List<EntradaGrafo> datosSerializables = new ArrayList<>();
             grafo.getGrafo().forEach((parada, rutas) -> {
                 datosSerializables.add(new EntradaGrafo(parada, rutas));
             });
-
             mapper.writeValue(new File(ruta), datosSerializables);
         } catch (IOException e) {
             e.printStackTrace();
@@ -33,31 +29,39 @@ public class GestorArchivos {
 
     public static void cargarDesdeJson(GrafoTransporte grafo, String ruta) {
         File f = new File(ruta);
-        if (!f.exists()) return; // Si no existe, no hacemos nada
+        if (!f.exists()) return;
 
         try {
-            // Leemos la lista de entradas
-            List<EntradaGrafo> datosLeidos = mapper.readValue(f, new TypeReference<List<EntradaGrafo>>() {
-            });
-
+            List<EntradaGrafo> datosLeidos = mapper.readValue(f, new TypeReference<List<EntradaGrafo>>() {});
             grafo.getGrafo().clear();
-            // Reconstruimos el Mapa
+
+            Map<String, Parada> masterMap = new HashMap<>();
             for (EntradaGrafo entrada : datosLeidos) {
-                grafo.getGrafo().put(entrada.getParada(), entrada.getRutas());
+                masterMap.put(entrada.getParada().getId(), entrada.getParada());
+            }
+
+            for (EntradaGrafo entrada : datosLeidos) {
+                Parada realOrigen = masterMap.get(entrada.getParada().getId());
+                List<Ruta> rutasReales = entrada.getRutas();
+
+                for (Ruta r : rutasReales) {
+                    Parada realDestino = masterMap.get(r.getDestino().getId());
+                    if (realDestino != null) {
+                        r.setDestino(realDestino);
+                    }
+                }
+                grafo.getGrafo().put(realOrigen, rutasReales);
             }
         } catch (IOException e) {
-            System.err.println("Error al leer el JSON. Iniciando con mapa vacío.");
+            System.err.println("Error al leer el JSON.");
         }
     }
 
-    // --- CLASE AUXILIAR PARA JACKSON ---
-    // Esta clase envuelve la Parada y sus Rutas para que Jackson no se confunda
     public static class EntradaGrafo {
         private Parada parada;
         private List<Ruta> rutas;
 
-        public EntradaGrafo() {
-        } // Para Jackson
+        public EntradaGrafo() {}
 
         public EntradaGrafo(Parada parada, List<Ruta> rutas) {
             this.parada = parada;
@@ -67,15 +71,12 @@ public class GestorArchivos {
         public Parada getParada() {
             return parada;
         }
-
         public void setParada(Parada parada) {
             this.parada = parada;
         }
-
         public List<Ruta> getRutas() {
             return rutas;
         }
-
         public void setRutas(List<Ruta> rutas) {
             this.rutas = rutas;
         }

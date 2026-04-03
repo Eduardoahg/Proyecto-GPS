@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class AppTransporte extends Application {
-    private static Stage primaryStage; // El stage principal para todo el proyecto
+    private static Stage primaryStage;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -16,7 +16,7 @@ public class AppTransporte extends Application {
 
         setRoot("MenuPrincipal.fxml", "GPS Transporte Urbano - PUCMM");
 
-        stage.setMaximized(true); // Que ocupe la pantalla según el dispositivo
+        stage.setMaximized(true);
         stage.show();
     }
 
