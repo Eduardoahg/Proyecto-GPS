@@ -40,7 +40,7 @@
                                 <Button onAction="#entrarAlGPS" prefHeight="55.0" prefWidth="320.0"
                                         style="-fx-background-color: #5299D3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 15; -fx-cursor: hand;" text="📍 ACCEDER AL GPS" />
                                 <Button onAction="#abrirEditor" prefHeight="55.0" prefWidth="320.0"
-                                        style="-fx-background-color: #BEB8EB; -fx-text-fill: #5E5C6C; -fx-font-weight: bold; -fx-background-radius: 15; -fx-cursor: hand;" text="🛠️ CONFIGURAR RED" />
+                                        style="-fx-background-color: #BEB8EB; -fx-text-fill: #5E5C6C; -fx-font-weight: bold; -fx-background-radius: 15; -fx-cursor: hand;" text="🛠 CONFIGURAR RED" />
                                 <Button onAction="#salirApp" prefHeight="45.0" prefWidth="180.0"
                                         style="-fx-background-color: #5E5C6C; -fx-text-fill: white; -fx-background-radius: 15; -fx-cursor: hand;" text="SALIR" />
                             </children>

@@ -33,8 +33,6 @@ public class TransporteVisual {
     private static GrafoTransporte sistema = new GrafoTransporte();
     private AlgDijkstra dijkstra = new AlgDijkstra();
     private AlgBellmanFord bellmanFord = new AlgBellmanFord();
-    private AlgFloydWarshall floydWarshall = new AlgFloydWarshall();
-    private AlgRecorridos recorridos = new AlgRecorridos();
 
     private final String FILE_JSON = "transporte_datos.json";
     private final String FILE_MAPA = "mapa.jpg";
@@ -65,7 +63,7 @@ public class TransporteVisual {
             cbCriterio.setValue("Tiempo");
         }
         if (cbAlgoritmo != null) {
-            cbAlgoritmo.getItems().addAll("Dijkstra", "Bellman-Ford", "Floyd-Warshall", "BFS", "DFS");
+            cbAlgoritmo.getItems().addAll("Dijkstra", "Bellman-Ford");
             cbAlgoritmo.setValue("Dijkstra");
         }
         actualizarTodo();
@@ -76,7 +74,7 @@ public class TransporteVisual {
         if (canvasGPS != null) dibujar(canvasGPS, null, null);
     }
 
-    private void dibujar(Canvas canvas, List<Parada> optima, List<Parada> segundaMejor) {
+    private void dibujar(Canvas canvas, List<Parada> optima, List<Parada> segunda) {
         if (canvas == null) return;
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -90,16 +88,16 @@ public class TransporteVisual {
                 double x1 = p.getX() + mapOffsetX, y1 = p.getY() + mapOffsetY;
                 double x2 = r.getDestino().getX() + mapOffsetX, y2 = r.getDestino().getY() + mapOffsetY;
 
-                Color color = Color.web("#D3D3D3");
-                double ancho = 2.0;
+                Color color = Color.BLACK;
+                double ancho = 2.5;
 
-                if (segundaMejor != null && estaEnCamino(p, r.getDestino(), segundaMejor)) {
+                if (segunda != null && estaEnCamino(p, r.getDestino(), segunda)) {
                     color = Color.GOLD;
                     ancho = 8.0;
                 }
 
                 if (optima != null && estaEnCamino(p, r.getDestino(), optima)) {
-                    color = Color.LIMEGREEN;
+                    color = Color.web("#32CD32");
                     ancho = 5.0;
                 }
 
@@ -111,8 +109,8 @@ public class TransporteVisual {
             double px = p.getX() + mapOffsetX, py = p.getY() + mapOffsetY;
 
             Color c = Color.web("#0B5563");
-            if (optima != null && optima.contains(p)) c = Color.LIMEGREEN;
-            else if (segundaMejor != null && segundaMejor.contains(p)) c = Color.GOLD;
+            if (optima != null && optima.contains(p)) c = Color.web("#32CD32");
+            else if (segunda != null && segunda.contains(p)) c = Color.GOLD;
 
             gc.setEffect(new DropShadow(10, Color.BLACK));
             gc.setFill(c);
@@ -167,16 +165,23 @@ public class TransporteVisual {
         String crit = cbCriterio.getValue();
         String alg = cbAlgoritmo.getValue();
 
-        if (ori.isEmpty() || dest.isEmpty() || crit == null || alg == null) return;
+        if (ori.isEmpty() || dest.isEmpty()) return;
+        if (crit == null || alg == null) return;
 
-        List<List<Parada>> todosLosCaminos = encontrarTodosLosCaminos(ori, dest);
-        todosLosCaminos.sort(Comparator.comparingDouble(camino -> calcularPesoCamino(camino, crit)));
+        List<Parada> optima;
+        List<Parada> segunda = new ArrayList<>();
 
-        List<Parada> optima = (todosLosCaminos.size() > 0) ? todosLosCaminos.get(0) : new ArrayList<>();
-        List<Parada> segundaMejor = (todosLosCaminos.size() > 1) ? todosLosCaminos.get(1) : new ArrayList<>();
+        if (alg.equals("Dijkstra")) {
+            optima = dijkstra.ejecutar(sistema, ori, dest, crit);
+            List<List<Parada>> todos = encontrarTodosLosCaminos(ori, dest);
+            todos.sort(Comparator.comparingDouble(c -> calcularPesoCamino(c, crit)));
+            if (todos.size() > 1) segunda = todos.get(1);
+        } else {
+            optima = bellmanFord.ejecutar(sistema, ori, dest, crit);
+        }
 
-        dibujar(canvasGPS, optima, segundaMejor);
-        mostrarDetallesDual(optima, segundaMejor, alg, crit);
+        dibujar(canvasGPS, optima, segunda);
+        mostrarDetallesDual(optima, segunda, alg, crit);
     }
 
     private List<List<Parada>> encontrarTodosLosCaminos(String idOri, String idDest) {
@@ -184,26 +189,23 @@ public class TransporteVisual {
         Parada origen = sistema.buscarParada(idOri);
         Parada destino = sistema.buscarParada(idDest);
         if (origen == null || destino == null) return resultados;
-
         buscarRecursivo(origen, destino, new ArrayList<>(), new ArrayList<>(), resultados);
         return resultados;
     }
 
-    private void buscarRecursivo(Parada actual, Parada destino, List<Parada> caminoActual, List<Parada> visitados, List<List<Parada>> resultados) {
+    private void buscarRecursivo(Parada actual, Parada destino, List<Parada> camino, List<Parada> visitados, List<List<Parada>> res) {
         visitados.add(actual);
-        caminoActual.add(actual);
-
+        camino.add(actual);
         if (actual.equals(destino)) {
-            resultados.add(new ArrayList<>(caminoActual));
+            res.add(new ArrayList<>(camino));
         } else {
             for (Ruta r : sistema.getGrafo().getOrDefault(actual, new ArrayList<>())) {
                 if (!visitados.contains(r.getDestino())) {
-                    buscarRecursivo(r.getDestino(), destino, caminoActual, visitados, resultados);
+                    buscarRecursivo(r.getDestino(), destino, camino, visitados, res);
                 }
             }
         }
-
-        caminoActual.remove(caminoActual.size() - 1);
+        camino.remove(camino.size() - 1);
         visitados.remove(actual);
     }
 
@@ -220,31 +222,30 @@ public class TransporteVisual {
     private void mostrarDetallesDual(List<Parada> optima, List<Parada> segunda, String alg, String crit) {
         log.clear();
         log.appendText("Algoritmo: " + alg + " (" + crit + ")\n");
-
-        if (optima == null || optima.isEmpty()) {
+        if (optima.isEmpty()) {
             log.appendText("No hay ruta disponible.");
             return;
         }
-
         double[] mOpt = obtenerMetricas(optima);
-        log.appendText("MEJOR (VERDE): " + CalculadoraRutas.formatearTiempo(mOpt[0]) + " | " + String.format("%.2f", mOpt[1]) + "km | $" + String.format("%.1f", mOpt[2]) + "\n");
-
-        if (segunda != null && !segunda.isEmpty()) {
+        log.appendText("MEJOR (VERDE): " + CalculadoraRutas.formatearTiempo(mOpt[0]) + " | " + String.format("%.2f", mOpt[1]) + "km | $" + String.format("%.1f", mOpt[2]) + " | Transbordos: " + (int)mOpt[3] + "\n");
+        if (!segunda.isEmpty()) {
             double[] mSeg = obtenerMetricas(segunda);
-            log.appendText("SEGUNDA (AMARILLO): " + CalculadoraRutas.formatearTiempo(mSeg[0]) + " | " + String.format("%.2f", mSeg[1]) + "km | $" + String.format("%.1f", mSeg[2]));
-        } else {
-            log.appendText("No hay ruta alternativa disponible.");
+            log.appendText("SEGUNDA (ORO): " + CalculadoraRutas.formatearTiempo(mSeg[0]) + " | " + String.format("%.2f", mSeg[1]) + "km | $" + String.format("%.1f", mSeg[2]) + " | Transbordos: " + (int)mSeg[3]);
         }
     }
 
     private double[] obtenerMetricas(List<Parada> camino) {
-        double t = 0, d = 0;
+        double t = 0, d = 0, tr = 0;
         for (int i = 0; i < camino.size() - 1; i++) {
             Parada u = camino.get(i); Parada v = camino.get(i + 1);
             Ruta r = sistema.getGrafo().get(u).stream().filter(rt -> rt.getDestino().equals(v)).findFirst().orElse(null);
-            if (r != null) { t += r.getTiempo(); d += r.getDistancia(); }
+            if (r != null) {
+                t += r.getTiempo();
+                d += r.getDistancia();
+                if(r.isRequiereTrasbordo()) tr++;
+            }
         }
-        return new double[]{t, d, CalculadoraRutas.calcularCosto(d, t)};
+        return new double[]{t, d, CalculadoraRutas.calcularCosto(d, t), tr};
     }
 
     private boolean estaEnCamino(Parada u, Parada v, List<Parada> camino) {
@@ -260,7 +261,6 @@ public class TransporteVisual {
         double realX = e.getX() - mapOffsetX;
         double realY = e.getY() - mapOffsetY;
         Parada p = buscarParada(realX, realY);
-
         if (e.getButton() == MouseButton.PRIMARY && p == null && e.getClickCount() == 1) {
             TextInputDialog d = new TextInputDialog("P" + (sistema.getGrafo().size() + 1));
             d.showAndWait().ifPresent(n -> {
@@ -268,15 +268,18 @@ public class TransporteVisual {
                 actualizarTodo();
             });
         } else if (e.getButton() == MouseButton.SECONDARY && p != null) {
-            List<String> op = Arrays.asList("Cambiar Nombre", "Eliminar Parada", "Eliminar Rutas");
+            List<String> op = Arrays.asList("Cambiar Nombre", "Eliminar Parada", "Eliminar Ruta Específica");
             new ChoiceDialog<>(op.get(0), op).showAndWait().ifPresent(o -> {
                 if (o.equals("Cambiar Nombre")) {
-                    new TextInputDialog(p.getNombre()).showAndWait().ifPresent(p::setNombre);
+                    new TextInputDialog(p.getNombre()).showAndWait().ifPresent(nuevo -> {
+                        sistema.modificarParada(p.getId(), nuevo);
+                    });
                 } else if (o.equals("Eliminar Parada")) {
                     sistema.eliminarParada(p.getId());
                 } else {
-                    sistema.getGrafo().get(p).clear();
-                    sistema.getGrafo().values().forEach(l -> l.removeIf(r -> r.getDestino().equals(p)));
+                    TextInputDialog d = new TextInputDialog("");
+                    d.setHeaderText("ID de la parada destino a desconectar:");
+                    d.showAndWait().ifPresent(dest -> sistema.eliminarRuta(p.getId(), dest));
                 }
                 actualizarTodo();
             });
