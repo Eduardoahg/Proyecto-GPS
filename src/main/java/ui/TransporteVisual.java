@@ -16,6 +16,7 @@ import model.Parada;
 import model.Ruta;
 import persistence.GestorArchivos;
 import structure.GrafoTransporte;
+import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
@@ -263,25 +264,41 @@ public class TransporteVisual {
         Parada p = buscarParada(realX, realY);
         if (e.getButton() == MouseButton.PRIMARY && p == null && e.getClickCount() == 1) {
             TextInputDialog d = new TextInputDialog("P" + (sistema.getGrafo().size() + 1));
+            ((Stage) d.getDialogPane().getScene().getWindow()).getIcons().add(new Image(getClass().getResourceAsStream("/logo.png")));
             d.showAndWait().ifPresent(n -> {
                 sistema.agregarParada(new Parada("P" + (sistema.getGrafo().size() + 1), n, "Urbana", realX, realY));
                 actualizarTodo();
             });
         } else if (e.getButton() == MouseButton.SECONDARY && p != null) {
             List<String> op = Arrays.asList("Cambiar Nombre", "Eliminar Parada", "Eliminar Ruta Específica");
-            new ChoiceDialog<>(op.get(0), op).showAndWait().ifPresent(o -> {
+            ChoiceDialog<String> cd = new ChoiceDialog<>(op.get(0), op);
+            ((Stage) cd.getDialogPane().getScene().getWindow()).getIcons().add(new Image(getClass().getResourceAsStream("/logo.png")));
+            cd.showAndWait().ifPresent(o -> {
                 if (o.equals("Cambiar Nombre")) {
-                    new TextInputDialog(p.getNombre()).showAndWait().ifPresent(nuevo -> {
+                    TextInputDialog d = new TextInputDialog(p.getNombre());
+                    ((Stage) d.getDialogPane().getScene().getWindow()).getIcons().add(new Image(getClass().getResourceAsStream("/logo.png")));
+                    d.showAndWait().ifPresent(nuevo -> {
                         sistema.modificarParada(p.getId(), nuevo);
+                        actualizarTodo();
                     });
                 } else if (o.equals("Eliminar Parada")) {
-                    sistema.eliminarParada(p.getId());
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "¿Seguro que quieres borrar la parada " + p.getNombre() + "?", ButtonType.YES, ButtonType.NO);
+                    ((Stage) confirm.getDialogPane().getScene().getWindow()).getIcons().add(new Image(getClass().getResourceAsStream("/logo.png")));
+                    confirm.showAndWait().ifPresent(resp -> {
+                        if (resp == ButtonType.YES) {
+                            sistema.eliminarParada(p.getId());
+                            actualizarTodo();
+                        }
+                    });
                 } else {
                     TextInputDialog d = new TextInputDialog("");
+                    ((Stage) d.getDialogPane().getScene().getWindow()).getIcons().add(new Image(getClass().getResourceAsStream("/logo.png")));
                     d.setHeaderText("ID de la parada destino a desconectar:");
-                    d.showAndWait().ifPresent(dest -> sistema.eliminarRuta(p.getId(), dest));
+                    d.showAndWait().ifPresent(dest -> {
+                        sistema.eliminarRuta(p.getId(), dest);
+                        actualizarTodo();
+                    });
                 }
-                actualizarTodo();
             });
         }
     }
