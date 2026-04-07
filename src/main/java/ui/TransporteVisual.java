@@ -86,8 +86,8 @@ public class TransporteVisual {
         // AJUSTES DE LA CAJA DE MENSAJES (LOG)
         if (log != null) {
             log.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
-            log.setPrefHeight(400);
-            log.setPrefWidth(850);
+            log.setPrefHeight(200);
+            log.setPrefWidth(200);
             log.setWrapText(false);
         }
 
