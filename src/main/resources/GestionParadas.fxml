@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="650.0" prefWidth="900.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.GestionParadasVisual">
+    <children>
+        <VBox VBox.vgrow="ALWAYS">
+            <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+            <children>
+                <Label text="GESTIÓN MANUAL DE PARADAS" style="-fx-font-weight: bold; -fx-font-size: 22;" textFill="#0B5563" />
+                <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <VBox spacing="10.0" prefWidth="300.0">
+                            <children>
+                                <TextField fx:id="txtId" promptText="ID (ej. P1)" style="-fx-background-radius: 10;" />
+                                <TextField fx:id="txtNombre" promptText="Nombre Parada" style="-fx-background-radius: 10;" />
+                                <TextField fx:id="txtLocalizacion" promptText="Localización" style="-fx-background-radius: 10;" />
+                                <TextField fx:id="txtX" promptText="Coord X" style="-fx-background-radius: 10;" />
+                                <TextField fx:id="txtY" promptText="Coord Y" style="-fx-background-radius: 10;" />
+                                <Button onAction="#crearParada" maxWidth="Infinity" style="-fx-background-color: #5299D3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;" text="CREAR PARADA" />
+                                <Button onAction="#modificarParada" maxWidth="Infinity" style="-fx-background-color: #BEB8EB; -fx-text-fill: #5E5C6C; -fx-font-weight: bold; -fx-background-radius: 10;" text="MODIFICAR SELECCIONADA" />
+                                <Button onAction="#limpiarCampos" maxWidth="Infinity" style="-fx-background-color: #A2BCE0; -fx-text-fill: #0B5563; -fx-font-weight: bold; -fx-background-radius: 10;" text="LIMPIAR CAMPOS" />
+                                <Button onAction="#eliminarParada" maxWidth="Infinity" style="-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-background-radius: 10;" text="ELIMINAR" />
+                            </children>
+                        </VBox>
+                        <ListView fx:id="listParadas" HBox.hgrow="ALWAYS" style="-fx-background-radius: 10;" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+        <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-background-color: #0B5563; -fx-padding: 15;">
+            <children>
+                <Button onAction="#actualizarDatos" style="-fx-background-color: #BEB8EB; -fx-text-fill: #5E5C6C; -fx-font-weight: bold; -fx-background-radius: 10;" text="RECARGAR DATOS" />
+                <Button onAction="#volver" style="-fx-background-color: #5E5C6C; -fx-text-fill: white; -fx-background-radius: 10;" text="Menú Principal" />
+            </children>
+        </HBox>
+    </children>
+</VBox>
