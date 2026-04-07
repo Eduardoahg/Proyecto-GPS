@@ -56,30 +56,48 @@ public class TransporteVisual {
         }
 
         if (cbCriterio != null) {
-            cbCriterio.getItems().addAll("Tiempo", "Distancia", "Costo");
+            cbCriterio.getItems().setAll("Tiempo", "Distancia", "Costo", "Mínimos Trasbordos");
             cbCriterio.setValue("Tiempo");
+            cbCriterio.setPrefWidth(150);
         }
 
         if (cbAlgoritmo != null) {
-            cbAlgoritmo.getItems().addAll("Dijkstra", "Bellman-Ford", "Menos Paradas (BFS)", "Auditar Red (DFS)");
+            cbAlgoritmo.getItems().setAll(
+                    "Dijkstra",
+                    "Bellman-Ford",
+                    "Menos Paradas (BFS)",
+                    "Auditar Red (DFS)",
+                    "Matriz de Caminos (Floyd)"
+            );
             cbAlgoritmo.setValue("Dijkstra");
+            cbAlgoritmo.setPrefWidth(200); // Ajuste de ancho para alineación
 
-            // Lógica para bloquear criterios cuando el algoritmo no los requiere (BFS/DFS)
             cbAlgoritmo.valueProperty().addListener((obs, viejo, nuevo) -> {
-                if (nuevo.equals("Menos Paradas (BFS)") || nuevo.equals("Auditar Red (DFS)")) {
-                    cbCriterio.setDisable(true);
-                    cbCriterio.setOpacity(0.5);
-                } else {
-                    cbCriterio.setDisable(false);
-                    cbCriterio.setOpacity(1.0);
-                }
+                if (nuevo == null) return;
+
+                boolean desactivar = nuevo.equals("Menos Paradas (BFS)") ||
+                        nuevo.equals("Auditar Red (DFS)");
+
+                cbCriterio.setDisable(desactivar);
+                cbCriterio.setOpacity(desactivar ? 0.5 : 1.0);
             });
         }
+
+        // AJUSTES DE LA CAJA DE MENSAJES (LOG)
+        if (log != null) {
+            log.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
+            log.setPrefHeight(400);
+            log.setPrefWidth(850);
+            log.setWrapText(false);
+        }
+
         actualizarTodo();
     }
 
+
     /**
      * PROCESO: Refresca la vista principal del sistema.
+     * FLUJO DE LLAMADAS: Llama a dibujar() asegurándose de limpiar cualquier ruta previa.
      */
     private void actualizarTodo() {
         if (canvasGPS != null) {
@@ -89,16 +107,49 @@ public class TransporteVisual {
 
     /**
      * PROCESO: Orquestador central de inteligencia de transporte.
+     * Gestiona la ejecución de algoritmos de optimización (Dijkstra/Bellman),
+     * conectividad (BFS) y auditoría profunda (DFS).
+     * * FLUJO DE LLAMADAS:
+     * 1. Recupera datos de los campos txtOrigen, txtDestino y ComboBoxes.
+     * 2. Según el algoritmo:
+     * - Optimización: Usa cbCriterio (Tiempo, Distancia, Costo).
+     * - Estructura: Ignora criterios (BFS/DFS).
+     * 3. Actualiza el Canvas y el TextArea de registro (log).
      */
+
     @FXML
     public void ejecutarCalculo() {
-        String idOri = txtOrigen.getText().trim();
-        String idDest = txtDestino.getText().trim();
         String algoritmo = cbAlgoritmo.getValue();
         String criterio = cbCriterio.isDisable() ? "Saltos" : cbCriterio.getValue();
 
-        if (idOri.isEmpty() || algoritmo == null) {
-            log.setText("ERROR: Se requiere al menos un origen y seleccionar un algoritmo.");
+        //CASOS ESPECIALES QUE NO REQUIEREN ORIGEN Y DESTINO SIMULTÁNEO
+        if (algoritmo == null) {
+            log.setText("ERROR: Debe seleccionar un algoritmo.");
+            return;
+        }
+
+        // Floyd-Warshall es global, no necesita ninguna parada
+        if (algoritmo.equals("Matriz de Caminos (Floyd)")) {
+            ejecutarFloydWarshall();
+            return;
+        }
+
+        String idOri = txtOrigen.getText().trim();
+        String idDest = txtDestino.getText().trim();
+
+        // DFS solo necesita origen para empezar la auditoría
+        if (algoritmo.equals("Auditar Red (DFS)")) {
+            if (idOri.isEmpty()) {
+                log.setText("ERROR: Seleccione una parada de origen para iniciar la auditoría (DFS).");
+            } else {
+                ejecutarAuditoriaDFS(idOri);
+            }
+            return;
+        }
+
+        //VALIDACIÓN PARA ALGORITMOS PUNTO A PUNTO (Dijkstra, Bellman, BFS)
+        if (idOri.isEmpty() || idDest.isEmpty()) {
+            log.setText("ERROR: Para " + algoritmo + " se requiere origen y destino.");
             return;
         }
 
@@ -108,39 +159,31 @@ public class TransporteVisual {
         try {
             switch (algoritmo) {
                 case "Dijkstra":
-                    if (idDest.isEmpty()) {
-                        log.setText("Indique destino para Dijkstra.");
-                        return;
-                    }
-                    optima = dijkstra.ejecutar(sistema, idOri, idDest, criterio);
-                    List<List<Parada>> todosLosCaminos = encontrarTodosLosCaminos(idOri, idDest);
-                    if (todosLosCaminos.size() > 1) {
-                        todosLosCaminos.sort(Comparator.comparingDouble(cam -> calcularPesoCamino(cam, criterio)));
-                        segunda = todosLosCaminos.get(1);
+                    if (criterio.equals("Mínimos Trasbordos")) {
+                        optima = calcularRutaPorSaltos(idOri, idDest);
+                    } else {
+                        optima = dijkstra.ejecutar(sistema, idOri, idDest, criterio);
+                        List<List<Parada>> todosLosCaminos = encontrarTodosLosCaminos(idOri, idDest);
+                        if (todosLosCaminos.size() > 1) {
+                            todosLosCaminos.sort(Comparator.comparingDouble(cam -> calcularPesoCamino(cam, criterio)));
+                            segunda = todosLosCaminos.get(1);
+                        }
                     }
                     break;
 
                 case "Bellman-Ford":
-                    if (idDest.isEmpty()) {
-                        log.setText("Indique destino para Bellman-Ford.");
-                        return;
-                    }
                     optima = bellmanFord.ejecutar(sistema, idOri, idDest, criterio);
                     break;
 
                 case "Menos Paradas (BFS)":
                     optima = calcularRutaPorSaltos(idOri, idDest);
                     break;
-
-                case "Auditar Red (DFS)":
-                    ejecutarAuditoriaDFS(idOri);
-                    return;
             }
 
             if (optima != null && !optima.isEmpty()) {
                 dibujar(canvasGPS, optima, segunda);
                 mostrarDetallesDual(optima, segunda, algoritmo, criterio);
-            } else if (!algoritmo.contains("DFS")) {
+            } else {
                 log.setText("No existe una ruta disponible entre " + idOri + " y " + idDest);
                 dibujar(canvasGPS, null, null);
             }
@@ -156,10 +199,10 @@ public class TransporteVisual {
      * Extraído como método independiente para mantener la estructura original.
      */
     private List<Parada> calcularRutaPorSaltos(String idOri, String idDest) {
-        if (idDest.isEmpty()) {
-            log.setText("Indique destino para BFS.");
-            return null;
-        }
+        // La validación de idDest ya se hace arriba en ejecutarCalculo,
+        // pero mantenemos esto por seguridad estructural.
+        if (idDest.isEmpty()) return null;
+
         Parada pStart = sistema.buscarParada(idOri);
         Parada pEnd = sistema.buscarParada(idDest);
         if (pStart != null && pEnd != null) {
@@ -206,7 +249,13 @@ public class TransporteVisual {
 
     /**
      * PROCESO: Renderiza gráficamente las paradas y rutas en el Canvas. Resalta los caminos óptimos y secundarios.
+     * ENTRADAS: Canvas destino, lista de parada óptima y lista de parada secundaria.
+     * FLUJO DE LLAMADAS:
+     * 1. Itera sobre sistema.getGrafo() para dibujar cada conexión.
+     * 2. Llama a estaEnCamino() para decidir el color y grosor de la línea.
+     * 3. Llama a dibujarAristaConFlecha() para representar el sentido de la ruta.
      */
+
     private void dibujar(Canvas canvas, List<Parada> optima, List<Parada> segunda) {
         if (canvas == null) return;
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -274,7 +323,10 @@ public class TransporteVisual {
 
     /**
      * PROCESO: Dibuja una línea con una punta de flecha para indicar la dirección de la ruta.
+     * ENTRADAS: Contexto gráfico, coordenadas de inicio y fin, color y ancho de línea.
+     * SALIDA: Representación visual de una arista dirigida en el Canvas.
      */
+
     private void dibujarAristaConFlecha(GraphicsContext gc, double x1, double y1, double x2, double y2, Color c, double a) {
         double dx = x2 - x1;
         double dy = y2 - y1;
@@ -301,6 +353,9 @@ public class TransporteVisual {
 
     /**
      * PROCESO: Localiza todos los caminos posibles entre dos puntos mediante una búsqueda en profundidad (DFS).
+     * ENTRADAS: IDs de origen y destino.
+     * SALIDA: Una lista de listas de paradas.
+     * FLUJO DE LLAMADAS: Llama a sistema.buscarParada() e inicia la recursión con buscarRecursivo().
      */
     private List<List<Parada>> encontrarTodosLosCaminos(String idOri, String idDest) {
         List<List<Parada>> resultados = new ArrayList<>();
@@ -315,6 +370,9 @@ public class TransporteVisual {
         return resultados;
     }
 
+    /**
+     * PROCESO: Método recursivo para explorar todas las ramas del grafo sin repetir nodos en el mismo camino.
+     */
     private void buscarRecursivo(Parada actual, Parada destino, List<Parada> camino, List<Parada> visitados, List<List<Parada>> res) {
         visitados.add(actual);
         camino.add(actual);
@@ -488,5 +546,60 @@ public class TransporteVisual {
     @FXML
     public void salirApp() {
         System.exit(0);
+    }
+
+    /**
+     * PROCESO: Genera y muestra una tabla con los costos mínimos entre todas las paradas.
+     * * FLUJO DE LLAMADAS:
+     * 1. Obtiene las paradas del sistema para definir filas y columnas.
+     * 2. Calcula la matriz de distancias según el criterio (Tiempo, Distancia o Costo).
+     * 3. Formatea el texto con columnas alineadas para que sea legible.
+     * * INTERPRETACIÓN:
+     * - FILAS: Punto de Origen.
+     * - COLUMNAS: Punto de Destino.
+     * - CELDAS: El camino más corto entre ambos (∞ si no hay conexión).
+     * * COMPLEJIDAD: Temporal O(V³) | Espacial O(V²)
+     */
+    private void ejecutarFloydWarshall() {
+        List<Parada> listaParadas = new ArrayList<>(sistema.getGrafo().keySet());
+        String criterio = cbCriterio.getValue();
+
+        double[][] matriz = FloydWarshall.generarMatrizDistancias(listaParadas, sistema.getGrafo(), criterio);
+
+        log.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 12px;");
+        log.setWrapText(false);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("═════════════════════════════════════════════════\n");
+        sb.append(" REPORTE ESTRATÉGICO: COSTOS MÍNIMOS GLOBAL\n");
+        sb.append("═════════════════════════════════════════════════\n");
+        sb.append("Interpretación: FILAS = Origen  |  COLUMNAS = Destino\n");
+        sb.append("Criterio: ").append(criterio.toUpperCase()).append("\n\n");
+
+        //Cabecera de columnas con ancho fijo de 10 espacios
+        sb.append(String.format("%-12s", "ORI\\DEST"));
+        for (Parada p : listaParadas) {
+            sb.append(String.format("%-10s", "[" + p.getId() + "]"));
+        }
+        sb.append("\n").append("═".repeat(12 + listaParadas.size() * 10)).append("\n");
+
+        //Cuerpo de la matriz
+        for (int i = 0; i < matriz.length; i++) {
+            // Nombre de la fila (Origen) con ancho fijo de 12
+            sb.append(String.format("%-12s", "[" + listaParadas.get(i).getId() + "]"));
+
+            for (int j = 0; j < matriz[i].length; j++) {
+                if (matriz[i][j] == Double.MAX_VALUE || matriz[i][j] >= 999999) {
+                    sb.append(String.format("%-10s", "  ∞"));
+                } else {
+                    // Formato de número con un decimal y espacios fijos
+                    sb.append(String.format("%-10.1f", matriz[i][j]));
+                }
+            }
+            sb.append("\n");
+        }
+
+        log.setText(sb.toString());
+        dibujar(canvasGPS, null, null);
     }
 }

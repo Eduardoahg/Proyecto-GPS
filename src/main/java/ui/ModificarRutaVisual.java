@@ -46,7 +46,7 @@ public class ModificarRutaVisual {
             GestorArchivos.cargarDesdeJson(sistema, FILE_JSON);
         }
 
-        // Corrección: Conversor para que el origen muestre el nombre de la parada
+        // Conversor para que el origen muestre el nombre de la parada
         cbOrigen.setConverter(new StringConverter<Parada>() {
             @Override
             public String toString(Parada p) {
@@ -182,7 +182,6 @@ public class ModificarRutaVisual {
         alerta.setTitle(titulo);
         alerta.setHeaderText(null);
         alerta.setContentText(contenido);
-        // Asegúrate de tener el logo.png en resources
         try {
             ((Stage) alerta.getDialogPane().getScene().getWindow()).getIcons().add(new Image(getClass().getResourceAsStream("/logo.png")));
         } catch (Exception e) { /* Silenciar si no hay logo */ }
