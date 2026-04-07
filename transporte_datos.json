@@ -51,19 +51,7 @@
     "x" : 1100.0,
     "y" : 200.0
   },
-  "rutas" : [ {
-    "destino" : {
-      "id" : "P3",
-      "nombre" : "C",
-      "localizacion" : "Urbana",
-      "x" : 720.8,
-      "y" : 427.2
-    },
-    "tiempo" : 22.1,
-    "distancia" : 8.84,
-    "costo" : 219.25,
-    "requiereTrasbordo" : false
-  } ]
+  "rutas" : [ ]
 }, {
   "parada" : {
     "id" : "P3",

@@ -384,7 +384,7 @@ public class TransporteVisual {
     }
 
     /**
-     * PROCESO: Calcula el peso total de un camino sumando el costo de cada arista individual según el criterio.
+     *  PROCESO: Calcula el peso total de un camino sumando el costo de cada arista individual según el criterio.
      */
     private double calcularPesoCamino(List<Parada> camino, String criterio) {
         double peso = 0;

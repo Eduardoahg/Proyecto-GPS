@@ -25,7 +25,7 @@
                                 <Label text="SISTEMA DE NAVEGACIÓN" textFill="WHITE" style="-fx-font-weight: bold;">
                                     <font><Font size="26.0" /></font>
                                 </Label>
-                                <Label text="URBANA GPS - PUCMM" textFill="#BEB8EB" style="-fx-font-weight: bold;">
+                                <Label text="GPS - PUCMM" textFill="#BEB8EB" style="-fx-font-weight: bold;">
                                     <font><Font size="20.0" /></font>
                                 </Label>
                             </children>

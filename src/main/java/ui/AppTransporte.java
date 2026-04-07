@@ -63,6 +63,7 @@ public class AppTransporte extends Application {
      * PROCESO: Provee acceso global al escenario principal de la aplicación.
      * SALIDA: El objeto Stage que representa la ventana principal.
      */
+
     public static Stage getPrimaryStage() {
         return primaryStage;
     }
