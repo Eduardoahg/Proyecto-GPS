@@ -99,12 +99,14 @@ public class ModificarRutaVisual {
             double d = Double.parseDouble(txtDistancia.getText());
             double c = Double.parseDouble(txtCosto.getText());
 
-            if (t <= 0 || d <= 0) {
-                mostrarAlerta("Error", "El tiempo y la distancia deben ser mayores a cero.");
+            if (t < 0 || d < 0 || c < 0) {
+                mostrarAlerta("Error", "Los valores de tiempo, distancia y/o costo no pueden ser negativos.");
                 return;
             }
 
-            r.setTiempo(t); r.setDistancia(d); r.setCosto(c);
+            r.setTiempo(t);
+            r.setDistancia(d);
+            r.setCosto(c);
 
             GestorArchivos.guardarEnJson(sistema, FILE_JSON);
             mostrarAlerta("Éxito", "Ruta actualizada correctamente.");

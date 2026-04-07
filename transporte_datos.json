@@ -28,7 +28,7 @@
     },
     "tiempo" : 50.0,
     "distancia" : 18.97,
-    "costo" : 378.84,
+    "costo" : 100.0,
     "requiereTrasbordo" : true
   }, {
     "destino" : {
