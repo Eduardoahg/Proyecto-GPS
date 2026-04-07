@@ -49,6 +49,10 @@
                                 <Button onAction="#guardarCambios" maxWidth="Infinity" style="-fx-background-color: #5299D3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;" text="GUARDAR CAMBIOS">
                                     <VBox.margin><Insets top="15" /></VBox.margin>
                                 </Button>
+
+                                <Button onAction="#eliminarRuta" maxWidth="Infinity" style="-fx-background-color: #d9534f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;" text="ELIMINAR RUTA">
+                                    <VBox.margin><Insets top="10" /></VBox.margin>
+                                </Button>
                             </children>
                         </VBox>
                         <VBox alignment="CENTER" style="-fx-background-color: #f4f4f4; -fx-background-radius: 15;" HBox.hgrow="ALWAYS">

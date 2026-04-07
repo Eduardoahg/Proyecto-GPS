@@ -70,7 +70,7 @@ public class TransporteVisual {
                     "Matriz de Caminos (Floyd)"
             );
             cbAlgoritmo.setValue("Dijkstra");
-            cbAlgoritmo.setPrefWidth(200); // Ajuste de ancho para alineación
+            cbAlgoritmo.setPrefWidth(200);  
 
             cbAlgoritmo.valueProperty().addListener((obs, viejo, nuevo) -> {
                 if (nuevo == null) return;
@@ -83,7 +83,7 @@ public class TransporteVisual {
             });
         }
 
-        // AJUSTES DE LA CAJA DE MENSAJES (LOG)
+        
         if (log != null) {
             log.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
             log.setPrefHeight(200);
@@ -122,13 +122,11 @@ public class TransporteVisual {
         String algoritmo = cbAlgoritmo.getValue();
         String criterio = cbCriterio.isDisable() ? "Saltos" : cbCriterio.getValue();
 
-        //CASOS ESPECIALES QUE NO REQUIEREN ORIGEN Y DESTINO SIMULTÁNEO
         if (algoritmo == null) {
             log.setText("ERROR: Debe seleccionar un algoritmo.");
             return;
         }
 
-        // Floyd-Warshall es global, no necesita ninguna parada
         if (algoritmo.equals("Matriz de Caminos (Floyd)")) {
             ejecutarFloydWarshall();
             return;
@@ -137,7 +135,6 @@ public class TransporteVisual {
         String idOri = txtOrigen.getText().trim();
         String idDest = txtDestino.getText().trim();
 
-        // DFS solo necesita origen para empezar la auditoría
         if (algoritmo.equals("Auditar Red (DFS)")) {
             if (idOri.isEmpty()) {
                 log.setText("ERROR: Seleccione una parada de origen para iniciar la auditoría (DFS).");
@@ -147,7 +144,6 @@ public class TransporteVisual {
             return;
         }
 
-        //VALIDACIÓN PARA ALGORITMOS PUNTO A PUNTO (Dijkstra, Bellman, BFS)
         if (idOri.isEmpty() || idDest.isEmpty()) {
             log.setText("ERROR: Para " + algoritmo + " se requiere origen y destino.");
             return;
@@ -196,11 +192,9 @@ public class TransporteVisual {
 
     /**
      * PROCESO: Calcula la ruta con menos transbordos utilizando BFS.
-     * Extraído como método independiente para mantener la estructura original.
+     * Extraído como metodo independiente para mantener la estructura original.
      */
     private List<Parada> calcularRutaPorSaltos(String idOri, String idDest) {
-        // La validación de idDest ya se hace arriba en ejecutarCalculo,
-        // pero mantenemos esto por seguridad estructural.
         if (idDest.isEmpty()) return null;
 
         Parada pStart = sistema.buscarParada(idOri);
@@ -261,7 +255,6 @@ public class TransporteVisual {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Dibujar primero todas las rutas (líneas)
         sistema.getGrafo().forEach((p, rutas) -> {
             for (Ruta r : rutas) {
                 double x1 = p.getX();
@@ -286,7 +279,6 @@ public class TransporteVisual {
             }
         });
 
-        // Dibujar luego las paradas (círculos) para que queden por encima de las líneas
         for (Parada p : sistema.getGrafo().keySet()) {
             double px = p.getX();
             double py = p.getY();
@@ -576,23 +568,20 @@ public class TransporteVisual {
         sb.append("Interpretación: FILAS = Origen  |  COLUMNAS = Destino\n");
         sb.append("Criterio: ").append(criterio.toUpperCase()).append("\n\n");
 
-        //Cabecera de columnas con ancho fijo de 10 espacios
         sb.append(String.format("%-12s", "ORI\\DEST"));
         for (Parada p : listaParadas) {
             sb.append(String.format("%-10s", "[" + p.getId() + "]"));
         }
         sb.append("\n").append("═".repeat(12 + listaParadas.size() * 10)).append("\n");
 
-        //Cuerpo de la matriz
+
         for (int i = 0; i < matriz.length; i++) {
-            // Nombre de la fila (Origen) con ancho fijo de 12
             sb.append(String.format("%-12s", "[" + listaParadas.get(i).getId() + "]"));
 
             for (int j = 0; j < matriz[i].length; j++) {
                 if (matriz[i][j] == Double.MAX_VALUE || matriz[i][j] >= 999999) {
                     sb.append(String.format("%-10s", "  ∞"));
                 } else {
-                    // Formato de número con un decimal y espacios fijos
                     sb.append(String.format("%-10.1f", matriz[i][j]));
                 }
             }

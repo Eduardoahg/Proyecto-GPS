@@ -23,13 +23,11 @@ public class FloydWarshall {
         int n = listaParadas.size();
         double[][] matriz = new double[n][n];
 
-        // 1. INICIALIZACIÓN TÉCNICA: Llenar con "infinito" y ceros en la diagonal
         for (int i = 0; i < n; i++) {
             Arrays.fill(matriz[i], Double.MAX_VALUE);
             matriz[i][i] = 0;
         }
 
-        // 2. CARGA DE DATOS: Llenar la matriz con las rutas directas existentes
         for (int i = 0; i < n; i++) {
             Parada origen = listaParadas.get(i);
             List<Ruta> rutasDesdeOrigen = grafo.getOrDefault(origen, new ArrayList<>());
@@ -37,21 +35,16 @@ public class FloydWarshall {
             for (Ruta r : rutasDesdeOrigen) {
                 int j = listaParadas.indexOf(r.getDestino());
                 if (j != -1) {
-                    // Usamos el método getPeso() que creamos en la clase Ruta
                     matriz[i][j] = r.getPeso(criterio);
                 }
             }
         }
 
-        // 3. EL CORAZÓN DEL ALGORITMO (Triple For)
-        // k = Nodo intermedio, i = Nodo origen, j = Nodo destino
         for (int k = 0; k < n; k++) {
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    // Verificamos que los tramos i->k y k->j existan (no sean infinito)
                     if (matriz[i][k] != Double.MAX_VALUE && matriz[k][j] != Double.MAX_VALUE) {
 
-                        // Si pasar por el nodo 'k' es más corto que la ruta actual 'i->j'
                         if (matriz[i][k] + matriz[k][j] < matriz[i][j]) {
                             matriz[i][j] = matriz[i][k] + matriz[k][j];
                         }

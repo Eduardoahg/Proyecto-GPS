@@ -19,16 +19,11 @@ import java.util.List;
  */
 public class ModificarRutaVisual {
 
-    @FXML
-    private ComboBox<Parada> cbOrigen;
-    @FXML
-    private ComboBox<Ruta> cbRuta;
-    @FXML
-    private TextField txtTiempo;
-    @FXML
-    private TextField txtDistancia;
-    @FXML
-    private TextField txtCosto;
+    @FXML private ComboBox<Parada> cbOrigen;
+    @FXML private ComboBox<Ruta> cbRuta;
+    @FXML private TextField txtTiempo;
+    @FXML private TextField txtDistancia;
+    @FXML private TextField txtCosto;
 
     private static GrafoTransporte sistema = new GrafoTransporte();
     private final String FILE_JSON = "transporte_datos.json";
@@ -36,9 +31,9 @@ public class ModificarRutaVisual {
     /**
      * PROCESO: Inicializa la pantalla configurando conversores y eventos de selección.
      * FLUJO DE LLAMADAS:
-     * 1. Carga datos desde JSON.
-     * 2. Configura StringConverters para mostrar nombres en lugar de direcciones de memoria.
-     * 3. Define la lógica de cascada: al elegir origen, se filtran las rutas disponibles.
+     * 1. Llama a GestorArchivos.cargarDesdeJson() para sincronizar el sistema.
+     * 2. Configura StringConverters para los ComboBoxes.
+     * 3. Establece el evento onAction para filtrar las rutas según el origen.
      */
     @FXML
     public void initialize() {
@@ -46,30 +41,14 @@ public class ModificarRutaVisual {
             GestorArchivos.cargarDesdeJson(sistema, FILE_JSON);
         }
 
-        // Conversor para que el origen muestre el nombre de la parada
         cbOrigen.setConverter(new StringConverter<Parada>() {
-            @Override
-            public String toString(Parada p) {
-                return (p == null) ? "" : p.getNombre();
-            }
-
-            @Override
-            public Parada fromString(String s) {
-                return null;
-            }
+            @Override public String toString(Parada p) { return (p == null) ? "" : p.getNombre(); }
+            @Override public Parada fromString(String s) { return null; }
         });
 
-        // Conversor para que la ruta muestre el destino y su distancia
         cbRuta.setConverter(new StringConverter<Ruta>() {
-            @Override
-            public String toString(Ruta r) {
-                return (r == null) ? "" : "Hacia: " + r.getDestino().getNombre() + " (" + String.format("%.1f", r.getDistancia()) + " km)";
-            }
-
-            @Override
-            public Ruta fromString(String s) {
-                return null;
-            }
+            @Override public String toString(Ruta r) { return (r == null) ? "" : "Hacia: " + r.getDestino().getNombre() + " (" + String.format("%.1f", r.getDistancia()) + " km)"; }
+            @Override public Ruta fromString(String s) { return null; }
         });
 
         cbOrigen.setOnAction(e -> {
@@ -93,19 +72,19 @@ public class ModificarRutaVisual {
     }
 
     /**
-     * PROCESO: Llena el selector de origen con todas las paradas que tienen rutas salientes.
+     * PROCESO: Llena el selector de origen con todas las paradas que tienen rutas salientes y limpia los campos.
      */
     private void cargarControles() {
         cbOrigen.getItems().clear();
         cbOrigen.getItems().addAll(sistema.getGrafo().keySet());
         cbRuta.getItems().clear();
-        txtTiempo.clear();
-        txtDistancia.clear();
-        txtCosto.clear();
+        txtTiempo.clear(); txtDistancia.clear(); txtCosto.clear();
     }
 
     /**
      * PROCESO: Actualiza los valores de una ruta existente y guarda en el archivo JSON.
+     * ENTRADAS: Datos extraídos de los TextFields.
+     * FLUJO DE LLAMADAS: Llama a GestorArchivos.guardarEnJson() tras la modificación.
      */
     @FXML
     public void guardarCambios() {
@@ -125,9 +104,7 @@ public class ModificarRutaVisual {
                 return;
             }
 
-            r.setTiempo(t);
-            r.setDistancia(d);
-            r.setCosto(c);
+            r.setTiempo(t); r.setDistancia(d); r.setCosto(c);
 
             GestorArchivos.guardarEnJson(sistema, FILE_JSON);
             mostrarAlerta("Éxito", "Ruta actualizada correctamente.");
@@ -139,9 +116,9 @@ public class ModificarRutaVisual {
     /**
      * PROCESO: Elimina la ruta seleccionada del sistema de forma permanente.
      * FLUJO DE LLAMADAS:
-     * 1. Obtiene la lista de rutas del origen seleccionado.
-     * 2. Remueve el objeto Ruta de dicha lista.
-     * 3. Sincroniza con el archivo JSON.
+     * 1. Obtiene la referencia de la lista de rutas del objeto Parada (origen).
+     * 2. Llama a rutas.remove(rutaAEliminar) para quitar el arco.
+     * 3. Llama a GestorArchivos.guardarEnJson() para persistir el cambio.
      */
     @FXML
     public void eliminarRuta() {
@@ -149,7 +126,6 @@ public class ModificarRutaVisual {
         Ruta rutaAEliminar = cbRuta.getValue();
 
         if (origen != null && rutaAEliminar != null) {
-            // Confirmación básica
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "¿Desea eliminar esta ruta permanentemente?");
             confirm.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
@@ -158,7 +134,7 @@ public class ModificarRutaVisual {
 
                     GestorArchivos.guardarEnJson(sistema, FILE_JSON);
                     mostrarAlerta("Eliminado", "La ruta ha sido removida del sistema.");
-                    cargarControles(); // Refrescar interfaz
+                    cargarControles();
                 }
             });
         } else {
@@ -177,6 +153,10 @@ public class ModificarRutaVisual {
         AppTransporte.setRoot("MenuPrincipal.fxml", "Inicio");
     }
 
+    /**
+     * PROCESO: Genera una ventana emergente para retroalimentación al usuario.
+     * ENTRADAS: Título y contenido del mensaje.
+     */
     private void mostrarAlerta(String titulo, String contenido) {
         Alert alerta = new Alert(Alert.AlertType.INFORMATION);
         alerta.setTitle(titulo);
@@ -184,7 +164,7 @@ public class ModificarRutaVisual {
         alerta.setContentText(contenido);
         try {
             ((Stage) alerta.getDialogPane().getScene().getWindow()).getIcons().add(new Image(getClass().getResourceAsStream("/logo.png")));
-        } catch (Exception e) { /* Silenciar si no hay logo */ }
+        } catch (Exception e) { }
         alerta.showAndWait();
     }
 }

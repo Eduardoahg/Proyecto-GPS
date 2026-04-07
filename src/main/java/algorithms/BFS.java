@@ -44,7 +44,7 @@ public class BFS {
                 }
             }
         }
-        return Collections.emptyList(); // Retorna lista vacía si no hay conexión
+        return Collections.emptyList();
     }
 
     /**
