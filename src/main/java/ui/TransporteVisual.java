@@ -25,10 +25,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class TransporteVisual {
-    @FXML private Canvas canvasGPS;
-    @FXML private TextArea log;
-    @FXML private TextField txtOrigen, txtDestino;
-    @FXML private ComboBox<String> cbCriterio, cbAlgoritmo;
+    @FXML
+    private Canvas canvasGPS;
+    @FXML
+    private TextArea log;
+    @FXML
+    private TextField txtOrigen, txtDestino;
+    @FXML
+    private ComboBox<String> cbCriterio, cbAlgoritmo;
 
     private static GrafoTransporte sistema = new GrafoTransporte();
     private AlgDijkstra dijkstra = new AlgDijkstra();
@@ -51,11 +55,11 @@ public class TransporteVisual {
         }
 
         if (cbCriterio != null) {
-            cbCriterio.getItems().addAll("Tiempo", "Distancia", "Transbordos", "Costo");
+            cbCriterio.getItems().addAll("Tiempo", "Distancia", "Costo");
             cbCriterio.setValue("Tiempo");
         }
         if (cbAlgoritmo != null) {
-            cbAlgoritmo.getItems().addAll("Dijkstra", "Bellman-Ford");
+            cbAlgoritmo.getItems().addAll("Dijkstra", "Bellman-Ford", "Menos Paradas (BFS)", "Auditar Red (Floyd)");
             cbAlgoritmo.setValue("Dijkstra");
         }
         actualizarTodo();
@@ -162,38 +166,118 @@ public class TransporteVisual {
         gc.fillPolygon(new double[]{endX, xA, xB}, new double[]{endY, yA, yB}, 3);
     }
 
-    /**
-     * PROCESO: Orquestador del cálculo de rutas. Obtiene los parámetros de la UI y ejecuta la búsqueda.
-     * FLUJO DE LLAMADAS:
-     * 1. Obtiene los valores de txtOrigen, txtDestino, cbCriterio y cbAlgoritmo.
-     * 2. Llama a dijkstra.ejecutar() o bellmanFord.ejecutar() según la selección.
-     * 3. Si usa Dijkstra, llama a encontrarTodosLosCaminos() y calcularPesoCamino() para hallar la segunda mejor ruta.
-     * 4. Llama a dibujar() para pintar los resultados en el mapa.
-     * 5. Llama a mostrarDetallesDual() para actualizar el log de texto.
-     */
     @FXML
+    /**
+     * PROCESO: Orquestador central de inteligencia de transporte.
+     * Gestiona la ejecución de algoritmos de optimización (Dijkstra/Bellman),
+     * conectividad (BFS) y auditoría profunda (DFS).
+     * * FLUJO DE LLAMADAS:
+     * 1. Recupera datos de los campos txtOrigen, txtDestino y ComboBoxes.
+     * 2. Según el algoritmo:
+     * - Optimización: Usa cbCriterio (Tiempo, Distancia, Costo).
+     * - Estructura: Ignora criterios (BFS/DFS).
+     * 3. Actualiza el Canvas y el TextArea de registro (log).
+     */
     public void ejecutarCalculo() {
-        String ori = txtOrigen.getText();
-        String dest = txtDestino.getText();
-        String crit = cbCriterio.getValue();
-        String alg = cbAlgoritmo.getValue();
+        String idOri = txtOrigen.getText().trim();
+        String idDest = txtDestino.getText().trim();
+        String algoritmo = cbAlgoritmo.getValue();
+        String criterio = (cbCriterio.getValue() != null) ? cbCriterio.getValue() : "Distancia";
 
-        if (ori.isEmpty() || dest.isEmpty() || crit == null || alg == null) return;
-
-        List<Parada> optima;
-        List<Parada> segunda = new ArrayList<>();
-
-        if (alg.equals("Dijkstra")) {
-            optima = dijkstra.ejecutar(sistema, ori, dest, crit);
-            List<List<Parada>> todos = encontrarTodosLosCaminos(ori, dest);
-            todos.sort(Comparator.comparingDouble(c -> calcularPesoCamino(c, crit)));
-            if (todos.size() > 1) segunda = todos.get(1);
-        } else {
-            optima = bellmanFord.ejecutar(sistema, ori, dest, crit);
+        // Validaciones iniciales
+        if (idOri.isEmpty() || algoritmo == null) {
+            log.setText("ERROR: Se requiere al menos un origen y seleccionar un algoritmo.");
+            return;
         }
 
-        dibujar(canvasGPS, optima, segunda);
-        mostrarDetallesDual(optima, segunda, alg, crit);
+        List<Parada> optima = new ArrayList<>();
+        List<Parada> segunda = new ArrayList<>();
+
+        try {
+            switch (algoritmo) {
+                case "Dijkstra":
+                    if (idDest.isEmpty()) { log.setText("Indique destino para Dijkstra."); return; }
+                    optima = dijkstra.ejecutar(sistema, idOri, idDest, criterio);
+
+                    // Cálculo de ruta alternativa (Segunda mejor)
+                    List<List<Parada>> todosLosCaminos = encontrarTodosLosCaminos(idOri, idDest);
+                    if (todosLosCaminos.size() > 1) {
+                        todosLosCaminos.sort(Comparator.comparingDouble(cam -> calcularPesoCamino(cam, criterio)));
+                        segunda = todosLosCaminos.get(1);
+                    }
+                    break;
+
+                case "Bellman-Ford":
+                    if (idDest.isEmpty()) { log.setText("Indique destino para Bellman-Ford."); return; }
+                    optima = bellmanFord.ejecutar(sistema, idOri, idDest, criterio);
+                    break;
+
+                case "Menos Paradas (BFS)":
+                    if (idDest.isEmpty()) { log.setText("Indique destino para BFS."); return; }
+                    Parada pStart = sistema.buscarParada(idOri);
+                    Parada pEnd = sistema.buscarParada(idDest);
+                    if (pStart != null && pEnd != null) {
+                        // BFS no usa criterios, solo cantidad de saltos
+                        optima = BFS.calcularRutaMinimosSaltos(sistema.getGrafo(), pStart, pEnd);
+                    }
+                    break;
+
+                case "Auditar Red (DFS)":
+                    // El Auditor DFS explora desde el origen todo lo alcanzable
+                    ejecutarAuditoriaDFS(idOri);
+                    return; // Salimos porque el DFS tiene su propia lógica de log y dibujo
+            }
+
+            // Renderizado de resultados en el mapa y log
+            if (optima != null && !optima.isEmpty()) {
+                dibujar(canvasGPS, optima, segunda);
+                mostrarDetallesDual(optima, segunda, algoritmo, criterio);
+            } else if (!algoritmo.contains("DFS")) {
+                log.setText("No existe una ruta disponible entre " + idOri + " y " + idDest);
+                dibujar(canvasGPS, null, null);
+            }
+
+        } catch (Exception e) {
+            log.setText("Error en la ejecución: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * PROCESO: Realiza el mapeo de conectividad profunda (DFS) y genera el reporte de auditoría.
+     */
+    private void ejecutarAuditoriaDFS(String idOrigen) {
+        Parada inicio = sistema.buscarParada(idOrigen);
+        if (inicio == null) {
+            log.setText("Origen no encontrado para auditoría.");
+            return;
+        }
+
+        List<Parada> visitados = new ArrayList<>();
+        StringBuilder reporte = new StringBuilder();
+        reporte.append("=== AUDITORÍA ESTRATÉGICA DE COBERTURA (DFS) ===\n");
+        reporte.append("Punto inicial: ").append(inicio.getNombre()).append("\n");
+        reporte.append("------------------------------------------------\n");
+
+        // Ejecuta la recursión del DFS
+        realizarMapeoDFS(inicio, visitados, reporte, 0);
+
+        log.setText(reporte.toString());
+        dibujar(canvasGPS, visitados, null); // Resalta todas las paradas auditadas en verde
+    }
+
+    /**
+     * PROCESO: Método recursivo para explorar la red y dar formato jerárquico al reporte.
+     */
+    private void realizarMapeoDFS(Parada actual, List<Parada> visitados, StringBuilder sb, int nivel) {
+        visitados.add(actual);
+        sb.append("  ".repeat(nivel)).append("└─ ").append(actual.getNombre()).append(" (ID: ").append(actual.getId()).append(")\n");
+
+        for (Ruta r : sistema.getGrafo().getOrDefault(actual, new ArrayList<>())) {
+            if (!visitados.contains(r.getDestino())) {
+                realizarMapeoDFS(r.getDestino(), visitados, sb, nivel + 1);
+            }
+        }
     }
 
     /**
@@ -237,7 +321,8 @@ public class TransporteVisual {
     private double calcularPesoCamino(List<Parada> camino, String criterio) {
         double peso = 0;
         for (int i = 0; i < camino.size() - 1; i++) {
-            Parada u = camino.get(i); Parada v = camino.get(i + 1);
+            Parada u = camino.get(i);
+            Parada v = camino.get(i + 1);
             Ruta r = sistema.getGrafo().get(u).stream().filter(rt -> rt.getDestino().equals(v)).findFirst().orElse(null);
             if (r != null) peso += dijkstra.obtenerPeso(r, criterio);
         }
@@ -256,10 +341,10 @@ public class TransporteVisual {
             return;
         }
         double[] mOpt = obtenerMetricas(optima);
-        log.appendText("MEJOR (VERDE): " + CalculadoraRutas.formatearTiempo(mOpt[0]) + " | " + String.format("%.2f", mOpt[1]) + "km | $" + String.format("%.2f", mOpt[2]) + " | Transbordos: " + (int)mOpt[3] + "\n");
+        log.appendText("MEJOR (VERDE): " + CalculadoraRutas.formatearTiempo(mOpt[0]) + " | " + String.format("%.2f", mOpt[1]) + "km | $" + String.format("%.2f", mOpt[2]) + " | Transbordos: " + (int) mOpt[3] + "\n");
         if (!segunda.isEmpty()) {
             double[] mSeg = obtenerMetricas(segunda);
-            log.appendText("SEGUNDA (ORO): " + CalculadoraRutas.formatearTiempo(mSeg[0]) + " | " + String.format("%.2f", mSeg[1]) + "km | $" + String.format("%.1f", mSeg[2]) + " | Transbordos: " + (int)mSeg[3]);
+            log.appendText("SEGUNDA (ORO): " + CalculadoraRutas.formatearTiempo(mSeg[0]) + " | " + String.format("%.2f", mSeg[1]) + "km | $" + String.format("%.1f", mSeg[2]) + " | Transbordos: " + (int) mSeg[3]);
         }
     }
 
@@ -270,10 +355,13 @@ public class TransporteVisual {
     private double[] obtenerMetricas(List<Parada> camino) {
         double t = 0, d = 0, c = 0, tr = 0;
         for (int i = 0; i < camino.size() - 1; i++) {
-            Parada u = camino.get(i); Parada v = camino.get(i + 1);
+            Parada u = camino.get(i);
+            Parada v = camino.get(i + 1);
             Ruta r = sistema.getGrafo().get(u).stream().filter(rt -> rt.getDestino().equals(v)).findFirst().orElse(null);
             if (r != null) {
-                t += r.getTiempo(); d += r.getDistancia(); c += r.getCosto();
+                t += r.getTiempo();
+                d += r.getDistancia();
+                c += r.getCosto();
                 tr += CalculadoraRutas.calcularTransbordos(r.getDistancia());
             }
         }
@@ -295,12 +383,16 @@ public class TransporteVisual {
      * PROCESO: Detecta clics en el canvas para asignar automáticamente el origen y el destino.
      * FLUJO DE LLAMADAS: Llama a buscarParada() y a actualizarTodo().
      */
-    @FXML public void seleccionarParadaMapa(MouseEvent e) {
+    @FXML
+    public void seleccionarParadaMapa(MouseEvent e) {
         Parada p = buscarParada(e.getX(), e.getY());
         if (p != null) {
             if (txtOrigen.getText().isEmpty() || (!txtOrigen.getText().isEmpty() && !txtDestino.getText().isEmpty())) {
-                txtOrigen.setText(p.getNombre()); txtDestino.clear();
-            } else { txtDestino.setText(p.getNombre()); }
+                txtOrigen.setText(p.getNombre());
+                txtDestino.clear();
+            } else {
+                txtDestino.setText(p.getNombre());
+            }
             actualizarTodo();
         }
     }
@@ -318,18 +410,21 @@ public class TransporteVisual {
      * PROCESO: Navegación entre las diferentes vistas de la aplicación.
      * FLUJO DE LLAMADAS: Llaman a AppTransporte.setRoot().
      */
-    @FXML public void entrarAlGPS() throws IOException {
+    @FXML
+    public void entrarAlGPS() throws IOException {
         AppTransporte.setRoot("UsuarioGPS.fxml", "GPS");
     }
 
-    @FXML public void abrirGestionParadas() throws IOException {
+    @FXML
+    public void abrirGestionParadas() throws IOException {
         AppTransporte.setRoot("GestionParadas.fxml", "Gestión de Paradas");
     }
 
     /**
      * PROCESO: Despliega un diálogo de elección para dirigir al usuario a la creación o modificación de rutas.
      */
-    @FXML public void abrirGestionRutas() throws IOException {
+    @FXML
+    public void abrirGestionRutas() throws IOException {
         List<String> choices = Arrays.asList("Crear Nuevas Rutas", "Modificar Rutas Existentes");
         ChoiceDialog<String> dialog = new ChoiceDialog<>("Crear Nuevas Rutas", choices);
         dialog.setTitle("Selección de Tarea");
@@ -337,7 +432,7 @@ public class TransporteVisual {
         ((Stage) dialog.getDialogPane().getScene().getWindow()).getIcons().add(new Image(getClass().getResourceAsStream("/logo.png")));
 
         Optional<String> result = dialog.showAndWait();
-        if (result.isPresent()){
+        if (result.isPresent()) {
             if (result.get().equals("Crear Nuevas Rutas")) {
                 AppTransporte.setRoot("CrearRuta.fxml", "Creación de Rutas");
             } else {
@@ -347,19 +442,75 @@ public class TransporteVisual {
     }
 
     /**
+     * PROCESO: Ejecuta el análisis de la red completa utilizando el algoritmo de Floyd-Warshall.
+     * FLUJO DE LLAMADAS:
+     * 1. Obtiene la lista de paradas y el criterio actual.
+     * 2. Llama a FloydWarshall.generarMatrizDistancias().
+     * 3. Formatea los resultados para mostrarlos en el TextArea (log).
+     */
+    @FXML
+    public void analizarRedCompleta() {
+        List<Parada> paradas = new ArrayList<>(sistema.getGrafo().keySet());
+        String criterio = cbCriterio.getValue();
+
+        double[][] matriz = FloydWarshall.generarMatrizDistancias(paradas, sistema.getGrafo(), criterio);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== ANÁLISIS DE RED (Floyd-Warshall) ===\n");
+        sb.append("Criterio: ").append(criterio).append("\n\n");
+
+        for (int i = 0; i < paradas.size(); i++) {
+            for (int j = 0; j < paradas.size(); j++) {
+                double valor = matriz[i][j];
+                if (valor != Double.MAX_VALUE && i != j) {
+                    sb.append(String.format("De %s a %s: %.2f\n",
+                            paradas.get(i).getNombre(), paradas.get(j).getNombre(), valor));
+                }
+            }
+        }
+        log.setText(sb.toString());
+    }
+
+    /**
+     * PROCESO: Busca la ruta con menos paradas utilizando BFS.
+     * FLUJO DE LLAMADAS:
+     * 1. Valida los IDs de origen y destino.
+     * 2. Llama a BusquedaAnchura.calcularRutaMinimosSaltos().
+     * 3. Llama a dibujar() para resaltar el camino en el mapa.
+     */
+    @FXML
+    public void calcularRutaPorSaltos() {
+        Parada inicio = sistema.buscarParada(txtOrigen.getText());
+        Parada fin = sistema.buscarParada(txtDestino.getText());
+
+        if (inicio != null && fin != null) {
+            List<Parada> rutaBFS = BFS.calcularRutaMinimosSaltos(sistema.getGrafo(), inicio, fin);
+            if (!rutaBFS.isEmpty()) {
+                dibujar(canvasGPS, rutaBFS, null);
+                log.setText("RUTA POR MÍNIMOS TRANSBORDOS (BFS):\n" + rutaBFS);
+            } else {
+                log.setText("No se encontró conexión entre las paradas.");
+            }
+        }
+    }
+
+    /**
      * PROCESO: Sincroniza el mapa visual con el estado actual del archivo JSON.
      * FLUJO DE LLAMADAS: Llama a GestorArchivos.cargarDesdeJson().
      */
-    @FXML public void actualizarMapa() {
+    @FXML
+    public void actualizarMapa() {
         GestorArchivos.cargarDesdeJson(sistema, FILE_JSON);
         actualizarTodo();
     }
 
-    @FXML public void volverAlInicio() throws IOException {
+    @FXML
+    public void volverAlInicio() throws IOException {
         AppTransporte.setRoot("MenuPrincipal.fxml", "Inicio");
     }
 
-    @FXML public void salirApp() {
+    @FXML
+    public void salirApp() {
         System.exit(0);
     }
 }
