@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="650.0" prefWidth="900.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.ModificarRutaVisual">
+    <children>
+        <VBox VBox.vgrow="ALWAYS">
+            <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+            <children>
+                <Label text="GESTIÓN MANUAL DE RUTAS" style="-fx-font-weight: bold; -fx-font-size: 22;" textFill="#0B5563" />
+                <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <VBox spacing="15.0" prefWidth="380.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                        <Label text="Origen:" prefWidth="120.0" style="-fx-font-weight: bold;" textFill="#0B5563" />
+                                        <ComboBox fx:id="cbOrigen" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-radius: 10;" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                        <Label text="Ruta Destino:" prefWidth="120.0" style="-fx-font-weight: bold;" textFill="#0B5563" />
+                                        <ComboBox fx:id="cbRuta" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-background-radius: 10;" />
+                                    </children>
+                                </HBox>
+                                <Separator />
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                        <Label text="Tiempo (min):" prefWidth="120.0" textFill="#0B5563" />
+                                        <TextField fx:id="txtTiempo" HBox.hgrow="ALWAYS" style="-fx-background-radius: 10;" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                        <Label text="Distancia (km):" prefWidth="120.0" textFill="#0B5563" />
+                                        <TextField fx:id="txtDistancia" HBox.hgrow="ALWAYS" style="-fx-background-radius: 10;" />
+                                    </children>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                        <Label text="Costo ($):" prefWidth="120.0" textFill="#0B5563" />
+                                        <TextField fx:id="txtCosto" HBox.hgrow="ALWAYS" style="-fx-background-radius: 10;" />
+                                    </children>
+                                </HBox>
+                                <Button onAction="#guardarCambios" maxWidth="Infinity" style="-fx-background-color: #5299D3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;" text="GUARDAR CAMBIOS">
+                                    <VBox.margin><Insets top="15" /></VBox.margin>
+                                </Button>
+                            </children>
+                        </VBox>
+                        <VBox alignment="CENTER" style="-fx-background-color: #f4f4f4; -fx-background-radius: 15;" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Selecciona el origen para ver sus conexiones" textFill="#5E5C6C">
+                                    <font><Font name="System Italic" size="14.0" /></font>
+                                </Label>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+        <HBox alignment="CENTER_RIGHT" spacing="15.0" style="-fx-background-color: #0B5563; -fx-padding: 15;">
+            <children>
+                <Button onAction="#actualizarDatos" style="-fx-background-color: #BEB8EB; -fx-text-fill: #5E5C6C; -fx-font-weight: bold; -fx-background-radius: 10;" text="RECARGAR DATOS" />
+                <Button onAction="#volver" style="-fx-background-color: #5E5C6C; -fx-text-fill: white; -fx-background-radius: 10;" text="VOLVER AL MENÚ" />
+            </children>
+        </HBox>
+    </children>
+</VBox>
