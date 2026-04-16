@@ -50,36 +50,4 @@ public class AlgDFS {
         visitados.remove(actual);
     }
 
-
-    /**
-     * PROCESO: Inicia una exploración profunda para auditar la conectividad de la red y genera un reporte jerárquico.
-     * ENTRADAS: El sistema de transporte, la parada inicial y una lista para rastrear nodos visitados.
-     * SALIDA: Una cadena de texto con el reporte visual de la estructura del grafo.
-     */
-    public String generarReporteAuditoria(GrafoTransporte sistema, Parada inicio, List<Parada> visitados) {
-        StringBuilder reporte = new StringBuilder();
-        reporte.append("=== AUDITORÍA ESTRATÉGICA DE COBERTURA (DFS) ===\n");
-        reporte.append("Punto inicial: ").append(inicio.getNombre()).append("\n");
-        reporte.append("------------------------------------------------\n");
-
-        realizarMapeoDFS(sistema, inicio, visitados, reporte, 0);
-        return reporte.toString();
-    }
-
-    /**
-     * PROCESO: Metodo recursivo para explorar la red y dar formato jerárquico al reporte.
-     */
-    private void realizarMapeoDFS(GrafoTransporte sistema, Parada actual, List<Parada> visitados,
-                                  StringBuilder sb, int nivel) {
-        visitados.add(actual);
-        for (int i = 0; i < nivel; i++) sb.append("  ");
-        sb.append("└─ ").append(actual.getNombre()).append("\n");
-
-        List<Ruta> rutas = sistema.obtenerRutasDe(actual);
-        for (Ruta r : rutas) {
-            if (!visitados.contains(r.getDestino())) {
-                realizarMapeoDFS(sistema, r.getDestino(), visitados, sb, nivel + 1);
-            }
-        }
-    }
 }

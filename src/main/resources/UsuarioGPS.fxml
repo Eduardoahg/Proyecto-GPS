@@ -1,44 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.canvas.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 
-<VBox prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.TransporteVisual">
+<VBox prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.TransporteVisual">
     <children>
         <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background-color: #e0e0e0;" VBox.vgrow="ALWAYS">
             <content>
                 <StackPane style="-fx-background-color: #cccccc;">
                     <children>
-                        <Canvas fx:id="canvasGPS" height="2000.0" width="2000.0" onMouseClicked="#seleccionarParadaMapa" />
+                        <Canvas fx:id="canvasGPS" height="2000.0" onMouseClicked="#seleccionarParadaMapa" width="2000.0" />
                     </children>
                 </StackPane>
             </content>
         </ScrollPane>
-        <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #0B5563; -fx-padding: 15; -fx-background-radius: 20 20 0 0;">
+        <HBox alignment="CENTER_LEFT" prefHeight="134.0" prefWidth="1280.0" spacing="15.0" style="-fx-background-color: #0B5563; -fx-padding: 15; -fx-background-radius: 20 20 0 0;">
             <children>
                 <VBox spacing="2.0">
                     <children>
-                        <Label text="Origen:" textFill="WHITE" style="-fx-font-weight: bold;" />
-                        <TextField fx:id="txtOrigen" promptText="Selecciona en mapa..." prefWidth="150.0" style="-fx-background-radius: 10;" />
+                        <Label style="-fx-font-weight: bold;" text="Origen:" textFill="WHITE" />
+                        <TextField fx:id="txtOrigen" prefWidth="150.0" promptText="Selecciona en mapa..." style="-fx-background-radius: 10;" />
                     </children>
                 </VBox>
                 <VBox spacing="2.0">
                     <children>
-                        <Label text="Destino:" textFill="WHITE" style="-fx-font-weight: bold;" />
-                        <TextField fx:id="txtDestino" promptText="Selecciona en mapa..." prefWidth="150.0" style="-fx-background-radius: 10;" />
+                        <Label style="-fx-font-weight: bold;" text="Destino:" textFill="WHITE" />
+                        <TextField fx:id="txtDestino" prefWidth="150.0" promptText="Selecciona en mapa..." style="-fx-background-radius: 10;" />
                     </children>
                 </VBox>
                 <VBox spacing="2.0">
                     <children>
-                        <Label text="Criterio:" textFill="WHITE" style="-fx-font-weight: bold;" />
+                        <Label style="-fx-font-weight: bold;" text="Criterio:" textFill="WHITE" />
                         <ComboBox fx:id="cbCriterio" prefWidth="120.0" style="-fx-background-radius: 10;" />
                     </children>
                 </VBox>
                 <VBox spacing="2.0">
                     <children>
-                        <Label text="Algoritmo:" textFill="WHITE" style="-fx-font-weight: bold;" />
+                        <Label style="-fx-font-weight: bold;" text="Algoritmo:" textFill="WHITE" />
                         <ComboBox fx:id="cbAlgoritmo" prefWidth="120.0" style="-fx-background-radius: 10;" />
                     </children>
                 </VBox>

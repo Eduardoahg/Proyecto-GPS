@@ -34,7 +34,7 @@ public class CalculadoraRutas {
     public static String formatearTiempo(double minutos) {
         int h = (int) minutos / 60;
         int m = (int) minutos % 60;
-        return (h > 0) ? h + "h " + m + "min" : m + "min";
+        return (h > 0) ? h + "h " + m + "min" + " |" : m + "min" + " |";
     }
 
     /**

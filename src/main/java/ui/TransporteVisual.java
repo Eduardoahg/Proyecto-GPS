@@ -136,15 +136,6 @@ public class TransporteVisual {
         String idOri = txtOrigen.getText().trim();
         String idDest = txtDestino.getText().trim();
 
-        if (algoritmo.equals("Auditar Red (DFS)")) {
-            if (idOri.isEmpty()) {
-                log.setText("ERROR: Seleccione una parada de origen para iniciar la auditoría (DFS).");
-            } else {
-                ejecutarAuditoriaDFS(idOri);
-            }
-            return;
-        }
-
         if (idOri.isEmpty() || idDest.isEmpty()) {
             log.setText("ERROR: Para " + algoritmo + " se requiere origen y destino.");
             return;
@@ -198,19 +189,6 @@ public class TransporteVisual {
         return new ArrayList<>();
     }
 
-    /**
-     * PROCESO: Realiza el mapeo de conectividad profunda (DFS) y genera el reporte de auditoría.
-     */
-    private void ejecutarAuditoriaDFS(String idOrigen) {
-        Parada inicio = sistema.buscarParada(idOrigen);
-        if (inicio == null) return;
-
-        List<Parada> visitados = new ArrayList<>();
-        String reporte = algDFS.generarReporteAuditoria(sistema, inicio, visitados);
-
-        log.setText(reporte);
-        dibujar(canvasGPS, visitados, null);
-    }
 
     /**
      * PROCESO: Renderiza gráficamente las paradas y rutas en el Canvas. Resalta los caminos óptimos y secundarios.
@@ -339,13 +317,13 @@ public class TransporteVisual {
         }
 
         double[] mOpt = obtenerMetricas(optima);
-        log.appendText("MEJOR (VERDE): " + String.format("%.1f", mOpt[0]) + " min | " +
+        log.appendText("MEJOR (VERDE): " + CalculadoraRutas.formatearTiempo(mOpt[0]) +
                 String.format("%.2f", mOpt[1]) + "km | $" +
                 String.format("%.2f", mOpt[2]) + " | Transbordos: " + (int) mOpt[3] + "\n");
 
         if (!segunda.isEmpty()) {
             double[] mSeg = obtenerMetricas(segunda);
-            log.appendText("SEGUNDA (ORO): " + String.format("%.1f", mSeg[0]) + " min | " +
+            log.appendText("SEGUNDA (ORO): " + CalculadoraRutas.formatearTiempo(mSeg[0]) +
                     String.format("%.2f", mSeg[1]) + "km | $" +
                     String.format("%.1f", mSeg[2]) + " | Transbordos: " + (int) mSeg[3]);
         }
