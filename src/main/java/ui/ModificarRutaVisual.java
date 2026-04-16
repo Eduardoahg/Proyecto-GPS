@@ -44,13 +44,21 @@ public class ModificarRutaVisual {
         }
 
         cbOrigen.setConverter(new StringConverter<Parada>() {
-            @Override public String toString(Parada p) { return (p == null) ? "" : p.getNombre(); }
-            @Override public Parada fromString(String s) { return null; }
+            @Override public String toString(Parada p) {
+                return (p == null) ? "" : p.getNombre();
+            }
+            @Override public Parada fromString(String s) {
+                return null;
+            }
         });
 
         cbRuta.setConverter(new StringConverter<Ruta>() {
-            @Override public String toString(Ruta r) { return (r == null) ? "" : "Hacia: " + r.getDestino().getNombre() + " (" + String.format("%.1f", r.getDistancia()) + " km)"; }
-            @Override public Ruta fromString(String s) { return null; }
+            @Override public String toString(Ruta r) {
+                return (r == null) ? "" : "Hacia: " + r.getDestino().getNombre() + " (" + String.format("%.1f", r.getDistancia()) + " km)";
+            }
+            @Override public Ruta fromString(String s) {
+                return null;
+            }
         });
 
         cbOrigen.setOnAction(e -> {

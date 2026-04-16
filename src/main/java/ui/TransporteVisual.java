@@ -67,7 +67,6 @@ public class TransporteVisual {
                     "Dijkstra",
                     "Bellman-Ford",
                     "Menos Paradas (BFS)",
-                    "Auditar Red (DFS)",
                     "Matriz de Caminos (Floyd)"
             );
             cbAlgoritmo.setValue("Dijkstra");
@@ -76,8 +75,7 @@ public class TransporteVisual {
             cbAlgoritmo.valueProperty().addListener((obs, viejo, nuevo) -> {
                 if (nuevo == null) return;
 
-                boolean desactivar = nuevo.equals("Menos Paradas (BFS)") ||
-                        nuevo.equals("Auditar Red (DFS)");
+                boolean desactivar = nuevo.equals("Menos Paradas (BFS)");
 
                 cbCriterio.setDisable(desactivar);
                 cbCriterio.setOpacity(desactivar ? 0.5 : 1.0);

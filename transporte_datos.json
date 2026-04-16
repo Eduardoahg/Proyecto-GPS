@@ -168,7 +168,19 @@
     "x" : 700.0,
     "y" : 690.0
   },
-  "rutas" : [ ]
+  "rutas" : [ {
+    "destino" : {
+      "id" : "P4",
+      "nombre" : "D",
+      "localizacion" : "Urbana",
+      "x" : 750.0,
+      "y" : 800.0
+    },
+    "tiempo" : 10.0,
+    "distancia" : 2.42,
+    "costo" : 118.06,
+    "requiereTrasbordo" : false
+  } ]
 }, {
   "parada" : {
     "id" : "P8",
@@ -214,13 +226,4 @@
     "costo" : 114.65,
     "requiereTrasbordo" : false
   } ]
-}, {
-  "parada" : {
-    "id" : "P9",
-    "nombre" : "I",
-    "localizacion" : "urbana",
-    "x" : 666.0,
-    "y" : 339.0
-  },
-  "rutas" : [ ]
 } ]
