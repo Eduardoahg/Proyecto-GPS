@@ -24,7 +24,7 @@ public class FloydWarshall {
         double[][] matriz = new double[n][n];
 
         for (int i = 0; i < n; i++) {
-            Arrays.fill(matriz[i], Double.MAX_VALUE);
+            Arrays.fill(matriz[i], Double.POSITIVE_INFINITY);
             matriz[i][i] = 0;
         }
 
@@ -43,7 +43,7 @@ public class FloydWarshall {
         for (int k = 0; k < n; k++) {
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    if (matriz[i][k] != Double.MAX_VALUE && matriz[k][j] != Double.MAX_VALUE) {
+                    if (matriz[i][k] != Double.POSITIVE_INFINITY && matriz[k][j] != Double.POSITIVE_INFINITY) {
 
                         if (matriz[i][k] + matriz[k][j] < matriz[i][j]) {
                             matriz[i][j] = matriz[i][k] + matriz[k][j];
@@ -53,21 +53,5 @@ public class FloydWarshall {
             }
         }
         return matriz;
-    }
-
-    /**
-     * PROCESO: Imprime la matriz en consola (útil para que el profe vea que funciona).
-     * ENTRADAS: La matriz generada y la lista de paradas para los nombres.
-     * SALIDA: Impresión visual en la terminal.
-     */
-    public static void imprimirMatriz(double[][] matriz, List<Parada> listaParadas) {
-        System.out.println("\n--- MATRIZ DE CAMINOS MÍNIMOS ---");
-        for (int i = 0; i < matriz.length; i++) {
-            for (int j = 0; j < matriz[i].length; j++) {
-                if (matriz[i][j] == Double.MAX_VALUE) System.out.print("INF\t");
-                else System.out.printf("%.2f\t", matriz[i][j]);
-            }
-            System.out.println();
-        }
     }
 }

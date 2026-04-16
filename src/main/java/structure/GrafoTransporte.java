@@ -25,10 +25,13 @@ public class GrafoTransporte {
      * ENTRADAS: ID de la parada y el nuevo nombre.
      * FLUJO DE LLAMADAS: Llama internamente a buscarParada() para localizar el nodo antes de modificarlo.
      */
-    public void modificarParada(String id, String nuevoNombre) {
+    public void modificarParada(String id, String nuevoNombre, String nuevaLoc, double nx, double ny) {
         Parada p = buscarParada(id);
         if (p != null) {
             p.setNombre(nuevoNombre);
+            p.setLocalizacion(nuevaLoc);
+            p.setX(nx);
+            p.setY(ny);
         }
     }
 
@@ -92,5 +95,38 @@ public class GrafoTransporte {
      */
     public Map<Parada, List<Ruta>> getGrafo() {
         return adjList;
+    }
+
+    /**
+     * PROCESO: Modifica las métricas de una ruta existente entre dos paradas específicas.
+     * ENTRADAS: IDs de origen y destino, y los nuevos valores de tiempo, distancia y costo.
+     * FLUJO DE LLAMADAS:
+     * 1. Llama a buscarParada() para localizar el nodo de origen.
+     * 2. Recorre la lista de adyacencia del origen para encontrar la ruta hacia el destino por su ID.
+     */
+    public void modificarRuta(String idOri, String idDest, double nt, double nd, double nc) {
+        Parada origen = buscarParada(idOri);
+        if (origen != null && adjList.containsKey(origen)) {
+            for (Ruta r : adjList.get(origen)) {
+                if (r.getDestino().getId().equalsIgnoreCase(idDest)) {
+                    r.setTiempo(nt);
+                    r.setDistancia(nd);
+                    r.setCosto(nc);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * PROCESO: Recupera la lista de rutas salientes de una parada específica.
+     * ENTRADAS: El objeto Parada del cual se desean obtener las conexiones.
+     * SALIDA: Una lista de objetos Ruta; devuelve una lista vacía si la parada no existe o no tiene conexiones.
+     */
+    public List<Ruta> obtenerRutasDe(Parada p) {
+        if (p != null && adjList.containsKey(p)) {
+            return adjList.get(p);
+        }
+        return new ArrayList<>();
     }
 }

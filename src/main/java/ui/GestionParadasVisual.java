@@ -83,25 +83,30 @@ public class GestionParadasVisual {
      */
     @FXML
     public void crearParada() {
-        try {
-            String id = txtId.getText();
-            String nombre = txtNombre.getText();
-            String loc = txtLocalizacion.getText();
-            double x = Double.parseDouble(txtX.getText());
-            double y = Double.parseDouble(txtY.getText());
+        String id = txtId.getText();
+        String nombre = txtNombre.getText();
+        String loc = txtLocalizacion.getText();
 
-            if (sistema.buscarParada(id) != null) {
-                mostrarAlerta("Error", "Ya existe una parada con ese ID.");
-                return;
-            }
-
-            sistema.agregarParada(new Parada(id, nombre, loc, x, y));
-            GestorArchivos.guardarEnJson(sistema, FILE_JSON);
-            actualizarLista();
-            limpiarCampos();
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "Coord. numéricas requeridas.");
+        if (id.isEmpty() || nombre.isEmpty()) {
+            mostrarAlerta("Error", "El ID y el nombre son obligatorios.");
+            return;
         }
+
+        if (sistema.buscarParada(id) != null) {
+            mostrarAlerta("Error", "Ya existe una parada con ese ID.");
+            return;
+        }
+
+        int randomX = (int) (100 + (Math.random() * 1100));
+        int randomY = (int) (100 + (Math.random() * 500));
+
+        txtX.setText(String.valueOf(randomX));
+        txtY.setText(String.valueOf(randomY));
+
+        sistema.agregarParada(new Parada(id, nombre, loc, randomX, randomY));
+        GestorArchivos.guardarEnJson(sistema, FILE_JSON);
+        actualizarLista();
+        limpiarCampos();
     }
 
     /**
@@ -115,14 +120,16 @@ public class GestionParadasVisual {
         Parada seleccionada = listParadas.getSelectionModel().getSelectedItem();
         if (seleccionada != null) {
             try {
-                seleccionada.setNombre(txtNombre.getText());
-                seleccionada.setLocalizacion(txtLocalizacion.getText());
-                seleccionada.setX(Double.parseDouble(txtX.getText()));
-                seleccionada.setY(Double.parseDouble(txtY.getText()));
+                String nombre = txtNombre.getText();
+                String loc = txtLocalizacion.getText();
+                double x = Double.parseDouble(txtX.getText());
+                double y = Double.parseDouble(txtY.getText());
+
+                sistema.modificarParada(seleccionada.getId(), nombre, loc, x, y);
 
                 GestorArchivos.guardarEnJson(sistema, FILE_JSON);
                 listParadas.refresh();
-                mostrarAlerta("Éxito", "Parada modificada.");
+                mostrarAlerta("Éxito", "Parada modificada correctamente.");
             } catch (NumberFormatException e) {
                 mostrarAlerta("Error", "Coord. inválidas.");
             }

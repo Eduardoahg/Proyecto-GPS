@@ -28,7 +28,7 @@
     },
     "tiempo" : 50.0,
     "distancia" : 18.97,
-    "costo" : 100.0,
+    "costo" : 245.0,
     "requiereTrasbordo" : true
   }, {
     "destino" : {
@@ -104,18 +104,6 @@
     "tiempo" : 10.6,
     "distancia" : 4.24,
     "costo" : 146.79,
-    "requiereTrasbordo" : false
-  }, {
-    "destino" : {
-      "id" : "P7",
-      "nombre" : "G",
-      "localizacion" : "URBANA",
-      "x" : 700.0,
-      "y" : 690.0
-    },
-    "tiempo" : 13.78,
-    "distancia" : 5.51,
-    "costo" : 166.79,
     "requiereTrasbordo" : false
   } ]
 }, {
@@ -203,18 +191,6 @@
     "requiereTrasbordo" : true
   }, {
     "destino" : {
-      "id" : "P5",
-      "nombre" : "E",
-      "localizacion" : "Urbana",
-      "x" : 210.0,
-      "y" : 900.0
-    },
-    "tiempo" : 5.5,
-    "distancia" : 2.2,
-    "costo" : 114.65,
-    "requiereTrasbordo" : false
-  }, {
-    "destino" : {
       "id" : "P7",
       "nombre" : "G",
       "localizacion" : "URBANA",
@@ -225,5 +201,26 @@
     "distancia" : 12.71,
     "costo" : 280.24,
     "requiereTrasbordo" : true
+  }, {
+    "destino" : {
+      "id" : "P5",
+      "nombre" : "E",
+      "localizacion" : "Urbana",
+      "x" : 210.0,
+      "y" : 900.0
+    },
+    "tiempo" : 5.5,
+    "distancia" : 2.2,
+    "costo" : 114.65,
+    "requiereTrasbordo" : false
   } ]
+}, {
+  "parada" : {
+    "id" : "P9",
+    "nombre" : "I",
+    "localizacion" : "urbana",
+    "x" : 666.0,
+    "y" : 339.0
+  },
+  "rutas" : [ ]
 } ]

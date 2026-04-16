@@ -1,17 +1,19 @@
 package ui;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.Parada;
 import model.Ruta;
-import structure.GrafoTransporte;
 import persistence.GestorArchivos;
+import structure.GrafoTransporte;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * PROCESO: Clase controladora encargada de gestionar la edición y eliminación de rutas existentes.
@@ -78,7 +80,9 @@ public class ModificarRutaVisual {
         cbOrigen.getItems().clear();
         cbOrigen.getItems().addAll(sistema.getGrafo().keySet());
         cbRuta.getItems().clear();
-        txtTiempo.clear(); txtDistancia.clear(); txtCosto.clear();
+        txtTiempo.clear();
+        txtDistancia.clear();
+        txtCosto.clear();
     }
 
     /**
@@ -88,8 +92,10 @@ public class ModificarRutaVisual {
      */
     @FXML
     public void guardarCambios() {
+        Parada origen = cbOrigen.getValue();
         Ruta r = cbRuta.getValue();
-        if (r == null) {
+
+        if (origen == null || r == null) {
             mostrarAlerta("Error", "Seleccione una ruta para modificar.");
             return;
         }
@@ -100,18 +106,16 @@ public class ModificarRutaVisual {
             double c = Double.parseDouble(txtCosto.getText());
 
             if (t < 0 || d < 0 || c < 0) {
-                mostrarAlerta("Error", "Los valores de tiempo, distancia y/o costo no pueden ser negativos.");
+                mostrarAlerta("Error", "Los valores no pueden ser negativos.");
                 return;
             }
 
-            r.setTiempo(t);
-            r.setDistancia(d);
-            r.setCosto(c);
+            sistema.modificarRuta(origen.getId(), r.getDestino().getId(), t, d, c);
 
             GestorArchivos.guardarEnJson(sistema, FILE_JSON);
             mostrarAlerta("Éxito", "Ruta actualizada correctamente.");
         } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "Asegúrese de ingresar valores numéricos válidos.");
+            mostrarAlerta("Error", "Ingrese valores numéricos válidos.");
         }
     }
 
@@ -131,8 +135,7 @@ public class ModificarRutaVisual {
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "¿Desea eliminar esta ruta permanentemente?");
             confirm.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-                    List<Ruta> rutas = sistema.getGrafo().get(origen);
-                    rutas.remove(rutaAEliminar);
+                    sistema.eliminarRuta(origen.getId(), rutaAEliminar.getDestino().getId());
 
                     GestorArchivos.guardarEnJson(sistema, FILE_JSON);
                     mostrarAlerta("Eliminado", "La ruta ha sido removida del sistema.");
